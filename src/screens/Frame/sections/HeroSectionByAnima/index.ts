@@ -1,0 +1,1 @@
+export { HeroSectionByAnima } from "./HeroSectionByAnima";
