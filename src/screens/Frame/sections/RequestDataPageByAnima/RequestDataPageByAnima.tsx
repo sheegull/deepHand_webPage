@@ -90,10 +90,10 @@ export const RequestDataPageByAnima = ({
   return (
     <div className="flex flex-col md:flex-row w-full bg-[#1e1e1e] min-h-screen">
       {/* Left side with logo */}
-      <div className="w-full md:w-1/2 h-full">
+      <div className="hidden md:flex w-full md:w-1/2 h-full">
         <div className="flex items-center mt-12 ml-4 md:ml-14 cursor-pointer" onClick={onLogoClick}>
-          <img className="w-[43px] h-[43px] object-cover" alt="Icon" src="/----icon-1-1.png" />
-          <div className="ml-4 font-alliance font-light text-white text-[32px] leading-[28.8px] whitespace-nowrap">
+          <img className="w-[40px] h-[40px] object-cover" alt="Icon" src="/----icon-1-1.png" />
+          <div className="ml-1 font-alliance font-light text-white text-[32px] leading-[28.8px] whitespace-nowrap">
             DeepHand
           </div>
         </div>
@@ -118,6 +118,17 @@ export const RequestDataPageByAnima = ({
             </a>
           </div>
         </footer>
+      </div>
+
+      {/* Mobile header */}
+      <div
+        className="flex justify-center items-center md:hidden mt-6 mb-6 cursor-pointer"
+        onClick={onLogoClick}
+      >
+        <img className="w-[24px] h-[24px] object-cover" src="/----icon-1-1.png" alt="Icon" />
+        <div className="ml-0.5 font-alliance font-light text-white text-[24px] leading-[20px] whitespace-nowrap">
+          DeepHand
+        </div>
       </div>
 
       {/* Right side with form */}
