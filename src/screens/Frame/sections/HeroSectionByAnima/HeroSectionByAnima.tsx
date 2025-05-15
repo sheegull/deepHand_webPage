@@ -208,7 +208,7 @@ export const HeroSectionByAnima = ({
                     placeholder="Taro Fuji"
                     className={`h-12 bg-[#ffffff10] rounded-lg border ${
                       errors.name ? "border-red-500" : "border-white/20"
-                    } text-white placeholder:text-white/50 font-alliance font-light text-sm`}
+                    } text-white placeholder:text-white/50 font-light text-sm`}
                   />
                   {errors.name && (
                     <span className="text-red-500 text-sm">{errors.name.message as string}</span>
@@ -224,7 +224,7 @@ export const HeroSectionByAnima = ({
                     placeholder="taro@example.com"
                     className={`h-12 bg-[#ffffff10] rounded-lg border ${
                       errors.email ? "border-red-500" : "border-white/20"
-                    } text-white placeholder:text-white/50 font-alliance font-light text-sm`}
+                    } text-white placeholder:text-white/50 font-light text-sm`}
                   />
                   {errors.email && (
                     <span className="text-red-500 text-sm">{errors.email.message as string}</span>
@@ -240,7 +240,7 @@ export const HeroSectionByAnima = ({
                     placeholder="What's up?"
                     className={`h-[100px] bg-[#ffffff10] rounded-lg border ${
                       errors.message ? "border-red-500" : "border-white/20"
-                    } text-white placeholder:text-white/50 font-alliance font-light text-sm`}
+                    } text-white placeholder:text-white/50 font-light text-sm`}
                   />
                   {errors.message && (
                     <span className="text-red-500 text-sm">{errors.message.message as string}</span>

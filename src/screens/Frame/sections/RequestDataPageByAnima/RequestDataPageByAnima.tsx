@@ -163,7 +163,7 @@ export const RequestDataPageByAnima = ({
                     id={field.id}
                     {...register(field.id)}
                     placeholder={field.placeholder}
-                    className={`h-12 bg-white border-gray-200 font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm ${
+                    className={`h-12 bg-white border-gray-200 font-light text-gray-900 placeholder:text-gray-400 text-sm ${
                       errors[field.id] ? "border-red-500" : ""
                     }`}
                   />
