@@ -25,36 +25,44 @@ interface HeroSectionByAnimaProps {
   onLogoClick: () => void;
 }
 
-export const HeroSectionByAnima = ({ onRequestClick, onLogoClick }: HeroSectionByAnimaProps): JSX.Element => {
+export const HeroSectionByAnima = ({
+  onRequestClick,
+  onLogoClick,
+}: HeroSectionByAnimaProps): JSX.Element => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [submitStatus, setSubmitStatus] = React.useState<'idle' | 'success' | 'error'>('idle');
+  const [submitStatus, setSubmitStatus] = React.useState<"idle" | "success" | "error">("idle");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm({
-    resolver: zodResolver(contactFormSchema)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(contactFormSchema),
   });
 
   const onSubmit = async (data: any) => {
     setIsSubmitting(true);
-    setSubmitStatus('idle');
+    setSubmitStatus("idle");
 
     try {
-      const response = await fetch('https://deephand-forms.workers.dev/api/contact', {
-        method: 'POST',
+      const response = await fetch("https://deephand-forms.workers.dev/api/contact", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
-      
+
       if (!response.ok) {
-        throw new Error('Failed to send message');
+        throw new Error("Failed to send message");
       }
-      
-      setSubmitStatus('success');
+
+      setSubmitStatus("success");
       reset();
     } catch (error) {
-      setSubmitStatus('error');
+      setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
     }
@@ -81,12 +89,8 @@ export const HeroSectionByAnima = ({ onRequestClick, onLogoClick }: HeroSectionB
         <div className="flex items-center justify-between w-full">
           {/* Logo */}
           <div className="flex items-center gap-2 cursor-pointer" onClick={onLogoClick}>
-            <img
-              className="w-8 h-8 object-cover"
-              alt="Icon"
-              src="/----icon-1-1.png"
-            />
-            <div className="[font-family:'Alliance_No.2-Light',Helvetica] font-light text-white text-xl md:text-2xl leading-[28.8px]">
+            <img className="w-8 h-8 object-cover" alt="Icon" src="/----icon-1-1.png" />
+            <div className="font-alliance font-light text-white text-xl md:text-2xl leading-[28.8px]">
               DeepHand
             </div>
           </div>
@@ -107,7 +111,7 @@ export const HeroSectionByAnima = ({ onRequestClick, onLogoClick }: HeroSectionB
               {navLinks.map((link, index) => (
                 <NavigationMenuItem key={index}>
                   <NavigationMenuLink
-                    className="[font-family:'Alliance_No.2-Light',Helvetica] font-light text-white text-[13px] lg:text-[15px] leading-[19.2px]"
+                    className="font-alliance font-light text-white text-[13px] lg:text-[15px] leading-[19.2px]"
                     href={link.href}
                   >
                     {link.text}
@@ -119,12 +123,12 @@ export const HeroSectionByAnima = ({ onRequestClick, onLogoClick }: HeroSectionB
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center gap-2 md:gap-4">
-            <Button className="w-[100px] h-11 bg-white text-[#1e1e1e] border-2 border-white rounded-md [font-family:'Alliance_No.2-Regular',Helvetica] font-normal text-sm hover:bg-[#1e1e1e] hover:text-white active:bg-[#1e1e1e] active:text-white transition-colors">
+            <Button className="w-[100px] h-11 bg-white text-[#1e1e1e] border-2 border-white rounded-md font-alliance font-normal text-sm hover:bg-[#1e1e1e] hover:text-white active:bg-[#1e1e1e] active:text-white transition-colors">
               Get Started
             </Button>
             <Button
               variant="outline"
-              className="w-[80px] md:w-[100px] h-11 bg-[#1e1e1e] text-white rounded-md border-2 border-white hover:bg-white/20 active:bg-white/30 transition-colors [font-family:'Alliance_No.2-Regular',Helvetica] font-normal text-sm"
+              className="w-[80px] md:w-[100px] h-11 bg-[#1e1e1e] text-white rounded-md border-2 border-white hover:bg-white/20 active:bg-white/30 transition-colors font-alliance font-light text-sm"
             >
               Login
             </Button>
@@ -134,7 +138,7 @@ export const HeroSectionByAnima = ({ onRequestClick, onLogoClick }: HeroSectionB
         {/* Mobile Navigation Menu */}
         <div
           className={`absolute top-20 left-0 right-0 bg-[#1e1e1e] transition-all duration-300 ease-in-out ${
-            isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+            isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
           } md:hidden border-t border-gray-700 shadow-lg`}
         >
           <nav className="flex flex-col py-3">
@@ -148,12 +152,12 @@ export const HeroSectionByAnima = ({ onRequestClick, onLogoClick }: HeroSectionB
               </a>
             ))}
             <div className="flex flex-col gap-2 mt-2 p-2 border-t border-gray-700">
-              <Button className="w-full h-11 bg-white text-[#1e1e1e] border-2 border-white rounded-md [font-family:'Alliance_No.2-Regular',Helvetica] font-normal text-sm hover:bg-[#1e1e1e] hover:text-white active:bg-[#1e1e1e] active:text-white transition-colors">
+              <Button className="w-full h-11 bg-white text-[#1e1e1e] border-2 border-white rounded-md font-alliance font-normal text-sm hover:bg-[#1e1e1e] hover:text-white active:bg-[#1e1e1e] active:text-white transition-colors">
                 Get Started
               </Button>
               <Button
                 variant="outline"
-                className="w-full h-11 bg-[#1e1e1e] text-white rounded-md border-2 border-white hover:bg-white/20 active:bg-white/30 transition-colors [font-family:'Alliance_No.2-Regular',Helvetica] font-normal text-sm"
+                className="w-full h-11 bg-[#1e1e1e] text-white rounded-md border-2 border-white hover:bg-white/20 active:bg-white/30 transition-colors font-alliance font-light text-sm"
               >
                 Login
               </Button>
@@ -167,17 +171,17 @@ export const HeroSectionByAnima = ({ onRequestClick, onLogoClick }: HeroSectionB
         <div className="flex flex-wrap justify-center md:justify-between py-[100px] md:py-[219px] gap-8">
           {/* Left Content */}
           <div className="flex flex-col max-w-[654px] gap-10 text-center md:text-left">
-            <h1 className="[font-family:'Alliance_No.2-Regular',Helvetica] font-normal text-white text-4xl md:text-[64px] leading-[1.1] mt-[65px]">
+            <h1 className="font-alliance font-normal text-white text-4xl md:text-[64px] leading-[1.1] mt-[65px]">
               Power Robotics <br />
               with Rich Human Data.
             </h1>
-            <p className="[font-family:'Alliance_No.2-Light',Helvetica] font-light text-zinc-400 text-lg md:text-xl leading-[30px] max-w-[555px]">
-              DeepHand is a team of annotation experts centered on robotics. We
-              deliver high-quality annotated data.
+            <p className="font-alliance font-light text-zinc-400 text-lg md:text-xl leading-[30px] max-w-[555px]">
+              DeepHand is a team of annotation experts centered on robotics. We deliver high-quality
+              annotated data.
             </p>
-            <Button 
+            <Button
               onClick={onRequestClick}
-              className="w-40 h-[52px] bg-[#234ad9] text-white rounded-md mt-6 [font-family:'Alliance_No.2-Medium',Helvetica] font-medium text-base mx-auto md:mx-0 hover:bg-[#1e3eb8] active:bg-[#183099] transition-colors"
+              className="w-40 h-[52px] bg-[#234ad9] text-white rounded-md mt-6 font-alliance font-medium text-base mx-auto md:mx-0 hover:bg-[#1e3eb8] active:bg-[#183099] transition-colors"
             >
               Request Data
             </Button>
@@ -186,23 +190,25 @@ export const HeroSectionByAnima = ({ onRequestClick, onLogoClick }: HeroSectionB
           {/* Contact Form Card */}
           <Card className="w-full md:w-[460px] bg-[#ffffff10] rounded-2xl shadow-[0px_0px_40px_#0000004d] border-none">
             <CardHeader className="px-8 pt-8 pb-0">
-              <CardTitle className="[font-family:'Alliance_No.2-Regular',Helvetica] font-normal text-white text-2xl leading-[28.8px]">
+              <CardTitle className="font-alliance font-normal text-white text-2xl leading-[28.8px]">
                 Get in Touch
               </CardTitle>
-              <CardDescription className="[font-family:'Alliance_No.2-Light',Helvetica] font-light text-[#aaaaaa] text-sm leading-[16.8px]">
+              <CardDescription className="font-alliance font-light text-[#aaaaaa] text-sm leading-[16.8px]">
                 Fill out the form below to learn more about DeepHand.
               </CardDescription>
             </CardHeader>
             <CardContent className="px-8 pt-6">
               <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
                 <div className="flex flex-col gap-2">
-                  <label className="[font-family:'Alliance_No.2-Regular',Helvetica] font-normal text-slate-200 text-sm leading-[16.8px]">
+                  <label className="font-alliance font-normal text-slate-200 text-sm leading-[16.8px]">
                     Name *
                   </label>
                   <Input
-                    {...register('name')}
+                    {...register("name")}
                     placeholder="Taro Fuji"
-                    className={`h-12 bg-[#ffffff10] rounded-lg border ${errors.name ? 'border-red-500' : 'border-white/20'} text-white placeholder:text-white/50 [font-family:'Alliance_No.2-Light',Helvetica] font-light text-sm`}
+                    className={`h-12 bg-[#ffffff10] rounded-lg border ${
+                      errors.name ? "border-red-500" : "border-white/20"
+                    } text-white placeholder:text-white/50 font-alliance font-light text-sm`}
                   />
                   {errors.name && (
                     <span className="text-red-500 text-sm">{errors.name.message as string}</span>
@@ -210,13 +216,15 @@ export const HeroSectionByAnima = ({ onRequestClick, onLogoClick }: HeroSectionB
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="[font-family:'Alliance_No.2-Regular',Helvetica] font-normal text-slate-200 text-sm leading-[16.8px]">
+                  <label className="font-alliance font-normal text-slate-200 text-sm leading-[16.8px]">
                     Email *
                   </label>
                   <Input
-                    {...register('email')}
+                    {...register("email")}
                     placeholder="taro@example.com"
-                    className={`h-12 bg-[#ffffff10] rounded-lg border ${errors.email ? 'border-red-500' : 'border-white/20'} text-white placeholder:text-white/50 [font-family:'Alliance_No.2-Light',Helvetica] font-light text-sm`}
+                    className={`h-12 bg-[#ffffff10] rounded-lg border ${
+                      errors.email ? "border-red-500" : "border-white/20"
+                    } text-white placeholder:text-white/50 font-alliance font-light text-sm`}
                   />
                   {errors.email && (
                     <span className="text-red-500 text-sm">{errors.email.message as string}</span>
@@ -224,33 +232,43 @@ export const HeroSectionByAnima = ({ onRequestClick, onLogoClick }: HeroSectionB
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="[font-family:'Alliance_No.2-Regular',Helvetica] font-normal text-slate-200 text-sm leading-[16.8px]">
+                  <label className="font-alliance font-normal text-slate-200 text-sm leading-[16.8px]">
                     Message *
                   </label>
                   <Textarea
-                    {...register('message')}
+                    {...register("message")}
                     placeholder="What's up?"
-                    className={`h-[100px] bg-[#ffffff10] rounded-lg border ${errors.message ? 'border-red-500' : 'border-white/20'} text-white placeholder:text-white/50 [font-family:'Alliance_No.2-Light',Helvetica] font-light text-sm`}
+                    className={`h-[100px] bg-[#ffffff10] rounded-lg border ${
+                      errors.message ? "border-red-500" : "border-white/20"
+                    } text-white placeholder:text-white/50 font-alliance font-light text-sm`}
                   />
                   {errors.message && (
                     <span className="text-red-500 text-sm">{errors.message.message as string}</span>
                   )}
                 </div>
 
-                <Button 
+                <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`h-12 rounded-lg [font-family:'Alliance_No.2-Medium',Helvetica] font-medium text-white text-base mt-6 transition-colors
-                    ${isSubmitting ? 'bg-[#234ad9]/70' : 'bg-[#234ad9] hover:bg-[#1e3eb8] active:bg-[#183099]'}`}
+                  className={`h-12 rounded-lg font-alliance font-medium text-white text-base mt-6 transition-colors
+                    ${
+                      isSubmitting
+                        ? "bg-[#234ad9]/70"
+                        : "bg-[#234ad9] hover:bg-[#1e3eb8] active:bg-[#183099]"
+                    }`}
                 >
-                  {isSubmitting ? 'Submitting...' : 'Submit'}
+                  {isSubmitting ? "Submitting..." : "Submit"}
                 </Button>
 
-                {submitStatus === 'success' && (
-                  <p className="text-green-500 text-sm text-center mt-2">Message sent successfully!</p>
+                {submitStatus === "success" && (
+                  <p className="text-green-500 text-sm text-center mt-2">
+                    Message sent successfully!
+                  </p>
                 )}
-                {submitStatus === 'error' && (
-                  <p className="text-red-500 text-sm text-center mt-2">Failed to send message. Please try again.</p>
+                {submitStatus === "error" && (
+                  <p className="text-red-500 text-sm text-center mt-2">
+                    Failed to send message. Please try again.
+                  </p>
                 )}
               </form>
             </CardContent>
@@ -259,7 +277,7 @@ export const HeroSectionByAnima = ({ onRequestClick, onLogoClick }: HeroSectionB
 
         {/* Footer */}
         <footer className="flex flex-col md:flex-row items-center justify-between w-full mt-20 gap-4 md:gap-0 pb-8">
-          <div className="[font-family:'Alliance_No.2-Light',Helvetica] font-light text-zinc-400 text-[10px] leading-[16.8px]">
+          <div className="font-alliance font-light text-zinc-400 text-[10px] leading-[16.8px]">
             © 2025 DeepHand. All Rights Reserved.
           </div>
           <div className="flex items-center gap-6">
@@ -267,7 +285,7 @@ export const HeroSectionByAnima = ({ onRequestClick, onLogoClick }: HeroSectionB
               <a
                 key={index}
                 href={link.href}
-                className="[font-family:'Alliance_No.2-Light',Helvetica] font-light text-zinc-400 text-[10px] leading-[16.8px]"
+                className="font-alliance font-light text-zinc-400 text-[10px] leading-[16.8px]"
               >
                 {link.text}
               </a>
