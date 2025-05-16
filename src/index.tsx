@@ -6,3 +6,5 @@ import { Frame } from "./screens/Frame/Frame";
 const root = document.getElementById("app");
 if (root) {
   createRoot(root).render(<Frame />);
+
+}
