@@ -22,12 +22,16 @@ import { Textarea } from "../../../../components/ui/textarea";
 
 interface HeroSectionByAnimaProps {
   onRequestClick: () => void;
+  onNavClick: (element: string) => void;
   onLogoClick: () => void;
+  isLoading: boolean;
 }
 
 export const HeroSectionByAnima = ({
   onRequestClick,
+  onNavClick,
   onLogoClick,
+  isLoading,
 }: HeroSectionByAnimaProps): JSX.Element => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [submitStatus, setSubmitStatus] = React.useState<"idle" | "success" | "error">("idle");
@@ -109,13 +113,14 @@ export const HeroSectionByAnima = ({
           <NavigationMenu className="hidden md:block mx-auto">
             <NavigationMenuList className="flex gap-4 lg:gap-8">
               {navLinks.map((link, index) => (
-                <NavigationMenuItem key={index}>
-                  <NavigationMenuLink
-                    className="font-alliance font-light text-white text-[13px] lg:text-[15px] leading-[19.2px]"
-                    href={link.href}
-                  >
+                <NavigationMenuItem 
+                  key={index}
+                  onClick={() => onNavClick(link.text.toLowerCase())}
+                  className="cursor-pointer"
+                >
+                  <span className="font-alliance font-light text-white text-[13px] lg:text-[15px] leading-[19.2px]">
                     {link.text}
-                  </NavigationMenuLink>
+                  </span>
                 </NavigationMenuItem>
               ))}
             </NavigationMenuList>
@@ -123,10 +128,14 @@ export const HeroSectionByAnima = ({
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center gap-2 md:gap-4">
-            <Button className="w-[100px] h-11 bg-white text-[#1e1e1e] border-2 border-white rounded-md font-alliance font-normal text-sm hover:bg-[#1e1e1e] hover:text-white active:bg-[#1e1e1e] active:text-white transition-colors">
+            <Button
+              onClick={() => onNavClick('get-started')}
+              className="w-[100px] h-11 bg-white text-[#1e1e1e] border-2 border-white rounded-md font-alliance font-normal text-sm hover:bg-[#1e1e1e] hover:text-white active:bg-[#1e1e1e] active:text-white transition-colors"
+            >
               Get Started
             </Button>
             <Button
+              onClick={() => onNavClick('login')}
               variant="outline"
               className="w-[80px] md:w-[100px] h-11 bg-[#1e1e1e] text-white rounded-md border-2 border-white hover:bg-white/20 active:bg-white/30 transition-colors font-alliance font-light text-sm"
             >
@@ -145,7 +154,7 @@ export const HeroSectionByAnima = ({
             {navLinks.map((link, index) => (
               <a
                 key={index}
-                href={link.href}
+                onClick={() => onNavClick(link.text.toLowerCase())}
                 className="py-2 px-4 text-white hover:bg-white/20 active:bg-white/30 transition-colors text-sm"
               >
                 {link.text}
@@ -284,7 +293,7 @@ export const HeroSectionByAnima = ({
             {footerLinks.map((link, index) => (
               <a
                 key={index}
-                href={link.href}
+                onClick={() => onNavClick(link.text.toLowerCase().replace(/\s+/g, '-'))}
                 className="font-alliance font-light text-zinc-400 text-[10px] leading-[16.8px]"
               >
                 {link.text}

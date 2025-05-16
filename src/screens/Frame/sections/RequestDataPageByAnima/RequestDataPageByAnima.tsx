@@ -10,10 +10,12 @@ import { Textarea } from "../../../../components/ui/textarea";
 
 interface RequestDataPageByAnimaProps {
   onLogoClick: () => void;
+  onFooterClick: (element: string) => void;
 }
 
 export const RequestDataPageByAnima = ({
   onLogoClick,
+  onFooterClick,
 }: RequestDataPageByAnimaProps): JSX.Element => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [submitStatus, setSubmitStatus] = React.useState<"idle" | "success" | "error">("idle");
@@ -105,13 +107,13 @@ export const RequestDataPageByAnima = ({
           </div>
           <div className="flex gap-6">
             <a
-              href="#"
+              onClick={() => onFooterClick('terms-of-service')}
               className="font-alliance font-light text-zinc-400 text-[10px] leading-[16.8px]"
             >
               Terms of service
             </a>
             <a
-              href="#"
+              onClick={() => onFooterClick('privacy-policy')}
               className="font-alliance font-light text-zinc-400 text-[10px] leading-[16.8px]"
             >
               Privacy policy
