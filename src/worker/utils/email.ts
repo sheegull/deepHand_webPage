@@ -5,22 +5,34 @@ interface EmailParams {
   data: Record<string, unknown>;
 }
 
+const MAILCHANNELS_API = 'https://api.mailchannels.net/tx/v1/send';
+
 export const sendEmail = async ({ to, subject, template, data }: EmailParams) => {
   const emailData = {
     to,
     subject,
-    from: 'noreply@deephandai.com',
+    from: {
+      email: 'noreply@deephandai.com',
+      name: 'DeepHand'
+    },
     text: generateEmailText(template, data),
   };
 
   try {
-    await fetch('https://api.mailchannels.net/tx/v1/send', {
+    const response = await fetch(MAILCHANNELS_API, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
+        'Authorization': `Bearer ${MAILCHANNELS_API_KEY}`
       },
       body: JSON.stringify(emailData),
     });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to send email: ${response.statusText}`);
+    }
+    
+    return true;
   } catch (error) {
     console.error('Email sending error:', error);
     throw new Error('Failed to send email');

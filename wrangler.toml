@@ -1,15 +1,20 @@
 [env.production]
 name = "deephand-forms"
 main = "src/worker/index.ts"
-compatibility_date = "2025-5-16"
+compatibility_date = "2024-02-16"
 
 [env.production.vars]
 CONTACT_EMAIL = "contact@deephandai.com"
 MAX_REQUESTS_PER_HOUR = "10"
+MAILCHANNELS_API_KEY = ""  # Will be set via Cloudflare dashboard
 
 [[env.production.r2_buckets]]
 binding = "FORM_STORAGE"
 bucket_name = "form-submissions"
+
+[[env.production.kv_namespaces]]
+binding = "KV"
+id = "form-submissions"
 
 [env.production.analytics_engine]
 binding = "ANALYTICS"
