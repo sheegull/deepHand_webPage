@@ -89,7 +89,7 @@ export const HeroSectionByAnima = ({
         <div className="flex items-center justify-between w-full">
           {/* Logo */}
           <div className="flex items-center gap-2 cursor-pointer" onClick={onLogoClick}>
-            <img className="w-8 h-8 object-cover" alt="Icon" src="/----icon-1-1.png" />
+            <img className="w-8 h-8 object-cover" alt="Icon" src="/logo.png" />
             <div className="font-alliance font-light text-white text-xl md:text-2xl leading-[28.8px]">
               DeepHand
             </div>
@@ -168,7 +168,7 @@ export const HeroSectionByAnima = ({
 
       {/* Main Content */}
       <main className="relative w-full px-4 md:px-[92px] flex-1 shadow-[0px_4px_4px_#00000040] mt-20">
-        <div className="flex flex-wrap justify-center md:justify-between py-[100px] md:py-[219px] gap-8">
+        <div className="flex flex-wrap justify-center md:justify-between py-[100px] md:py-[219px] gap-16">
           {/* Left Content */}
           <div className="flex flex-col max-w-[654px] gap-10 text-center md:text-left">
             <h1 className="font-alliance font-normal text-white text-4xl md:text-[64px] leading-[1.1] mt-[65px]">
@@ -181,7 +181,7 @@ export const HeroSectionByAnima = ({
             </p>
             <Button
               onClick={onRequestClick}
-              className="w-40 h-[52px] bg-[#234ad9] text-white rounded-md mt-6 font-alliance font-medium text-base mx-auto md:mx-0 hover:bg-[#1e3eb8] active:bg-[#183099] transition-colors"
+              className="w-40 h-[52px] bg-[#234ad9] text-white rounded-md font-alliance font-medium text-base mx-auto md:mx-0 hover:bg-[#1e3eb8] active:bg-[#183099] transition-colors"
             >
               Request Data
             </Button>
