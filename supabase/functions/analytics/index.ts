@@ -1,46 +1,43 @@
-import { corsHeaders } from '../_shared/cors.ts'
-
-interface NavigationEvent {
-  from: string;
-  to: string;
-  element: string;
-  timestamp: number;
-}
+import { corsHeaders } from "../_shared/cors.ts";
 
 Deno.serve(async (req) => {
   // Handle CORS
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+  if (req.method === "OPTIONS") {
+    return new Response(null, {
+      headers: corsHeaders,
+    });
   }
 
   try {
-    // Parse the navigation event from the request body
-    const event: NavigationEvent = await req.json()
+    if (req.method !== "POST") {
+      return new Response(JSON.stringify({ error: "Method not allowed" }), {
+        status: 405,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+        },
+      });
+    }
 
-    // Here you would typically store the event in your database
+    const event = await req.json();
+
+    // Here you would typically store the analytics event in your database
     // For now, we'll just log it and return success
-    console.log('Navigation event:', event)
+    console.log("Analytics event received:", event);
 
-    return new Response(
-      JSON.stringify({ success: true }),
-      {
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/json',
-        },
-        status: 200,
-      }
-    )
+    return new Response(JSON.stringify({ success: true }), {
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+      },
+    });
   } catch (error) {
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/json',
-        },
-        status: 400,
-      }
-    )
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+      },
+    });
   }
-})
+});
