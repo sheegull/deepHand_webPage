@@ -113,13 +113,13 @@ export const RequestDataPageByAnima = ({
               onClick={() => onFooterClick('terms-of-service')}
               className="font-alliance font-light text-zinc-400 text-[10px] leading-[16.8px]"
             >
-              Terms of service
+              {t('footer.termsOfService')}
             </a>
             <a
               onClick={() => onFooterClick('privacy-policy')}
               className="font-alliance font-light text-zinc-400 text-[10px] leading-[16.8px]"
             >
-              Privacy policy
+              {t('footer.privacyPolicy')}
             </a>
           </div>
         </footer>
@@ -242,13 +242,9 @@ export const RequestDataPageByAnima = ({
             {/* Submit button */}
             <Button
               type="submit"
-              disabled={isSubmitting || !isDirty || !isValid}
+              disabled={isSubmitting}
               className={`h-12 font-alliance font-medium text-white text-base transition-colors
-                ${
-                  isSubmitting || !isDirty || !isValid
-                    ? "bg-[#234ad9]/70"
-                    : "bg-[#234ad9] hover:bg-[#1e3eb8] active:bg-[#183099]"
-                }`}
+                ${isSubmitting ? "bg-[#234ad9]/70" : "bg-[#234ad9] hover:bg-[#1e3eb8] active:bg-[#183099]"}`}
             >
               {isSubmitting ? t('request.submitting') : t('request.submit')}
             </Button>
@@ -279,13 +275,13 @@ export const RequestDataPageByAnima = ({
               href="#"
               className="font-alliance font-light text-zinc-400 text-[10px] leading-[16.8px]"
             >
-              Terms of service
+              {t('footer.termsOfService')}
             </a>
             <a
               href="#"
               className="font-alliance font-light text-zinc-400 text-[10px] leading-[16.8px]"
             >
-              Privacy policy
+              {t('footer.privacyPolicy')}
             </a>
           </div>
         </div>
