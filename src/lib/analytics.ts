@@ -7,13 +7,18 @@ type NavigationEvent = {
 
 export const logNavigation = async (event: NavigationEvent) => {
   try {
-    await fetch('https://deephand-forms.workers.dev/api/analytics/navigation', {
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analytics`, {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(event),
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
   } catch (error) {
     console.error('Failed to log navigation event:', error);
   }
