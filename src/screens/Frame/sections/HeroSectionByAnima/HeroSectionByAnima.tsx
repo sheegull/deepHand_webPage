@@ -105,13 +105,12 @@ export const HeroSectionByAnima = ({
           {/* Mobile Menu Button */}
           <button
             className="md:hidden p-2 text-white"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
             aria-expanded={isMenuOpen}
           >
             <div className="flex items-center gap-2">
               <LanguageToggle />
-              <Menu className="w-6 h-6" />
+              <Menu className="w-6 h-6" onClick={() => setIsMenuOpen(!isMenuOpen)} />
             </div>
           </button>
 
@@ -137,14 +136,14 @@ export const HeroSectionByAnima = ({
             <LanguageToggle />
             <Button
               onClick={() => onNavClick('get-started')}
-              className="w-[100px] h-11 bg-white text-[#1e1e1e] border-2 border-white rounded-md font-alliance font-normal text-sm hover:bg-[#1e1e1e] hover:text-white active:bg-[#1e1e1e] active:text-white transition-colors"
+              className="w-[70px] md:w-[100px] h-9 md:h-11 bg-white text-[#1e1e1e] border-2 border-white rounded-md font-alliance font-normal text-xs md:text-sm hover:bg-[#1e1e1e] hover:text-white active:bg-[#1e1e1e] active:text-white transition-colors"
             >
               {t('nav.getStarted')}
             </Button>
             <Button
               onClick={() => onNavClick('login')}
               variant="outline"
-              className="w-[80px] md:w-[100px] h-11 bg-[#1e1e1e] text-white rounded-md border-2 border-white hover:bg-white/20 active:bg-white/30 transition-colors font-alliance font-light text-sm"
+              className="w-[60px] md:w-[100px] h-9 md:h-11 bg-[#1e1e1e] text-white rounded-md border-2 border-white hover:bg-white/20 active:bg-white/30 transition-colors font-alliance font-light text-xs md:text-sm"
             >
               {t('nav.login')}
             </Button>
@@ -168,12 +167,14 @@ export const HeroSectionByAnima = ({
               </a>
             ))}
             <div className="flex flex-col gap-2 mt-2 p-2 border-t border-gray-700">
-              <Button className="w-full h-11 bg-white text-[#1e1e1e] border-2 border-white rounded-md font-alliance font-normal text-sm hover:bg-[#1e1e1e] hover:text-white active:bg-[#1e1e1e] active:text-white transition-colors">
+              <Button
+                className="w-full h-9 bg-white text-[#1e1e1e] border-2 border-white rounded-md font-alliance font-normal text-sm hover:bg-[#1e1e1e] hover:text-white active:bg-[#1e1e1e] active:text-white transition-colors"
+              >
                 {t('nav.getStarted')}
               </Button>
               <Button
                 variant="outline"
-                className="w-full h-11 bg-[#1e1e1e] text-white rounded-md border-2 border-white hover:bg-white/20 active:bg-white/30 transition-colors font-alliance font-light text-sm"
+                className="w-full h-9 bg-[#1e1e1e] text-white rounded-md border-2 border-white hover:bg-white/20 active:bg-white/30 transition-colors font-alliance font-light text-sm"
               >
                 {t('nav.login')}
               </Button>
