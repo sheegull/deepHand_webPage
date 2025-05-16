@@ -169,8 +169,7 @@ export const RequestDataPageByAnima = ({
                     aria-invalid={errors[field.id] ? "true" : "false"}
                     aria-describedby={`${field.id}-error`}
                     className={`h-12 bg-white border-gray-200 font-light text-gray-900 placeholder:text-gray-400 text-sm ${
-                      errors[field.id] ? "border-red-500" : ""
-                      errors[field.id] ? "focus:ring-red-500" : "focus:ring-blue-500"
+                      errors[field.id] ? "border-red-500 focus:ring-red-500" : "focus:ring-blue-500"
                     }`}
                   />
                   {errors[field.id] && (
@@ -196,8 +195,7 @@ export const RequestDataPageByAnima = ({
                   aria-describedby="dataType-error"
                   placeholder="Data types"
                   className={`h-[100px] bg-white border-gray-200 font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none ${
-                    errors.dataType ? "border-red-500" : ""
-                    errors.dataType ? "focus:ring-red-500" : "focus:ring-blue-500"
+                    errors.dataType ? "border-red-500 focus:ring-red-500" : "focus:ring-blue-500"
                   }`}
                 />
                 {errors.dataType && (
