@@ -25,11 +25,10 @@ export const RequestDataPageByAnima = ({
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid, isDirty },
+    formState: { errors },
     reset,
   } = useForm({
     resolver: zodResolver(requestFormSchema),
-    mode: 'onChange',
   });
 
   const onSubmit = async (data: any) => {
@@ -168,14 +167,12 @@ export const RequestDataPageByAnima = ({
                     id={field.id}
                     {...register(field.id)}
                     placeholder={field.placeholder}
-                    aria-invalid={errors[field.id] ? "true" : "false"}
-                    aria-describedby={`${field.id}-error`}
                     className={`h-12 bg-white border-gray-200 font-light text-gray-900 placeholder:text-gray-400 text-sm ${
-                      errors[field.id] ? "border-red-500 focus:ring-red-500" : "focus:ring-blue-500"
+                      errors[field.id] ? "border-red-500" : ""
                     }`}
                   />
                   {errors[field.id] && (
-                    <span id={`${field.id}-error`} role="alert" className="text-red-500 text-sm">
+                    <span className="text-red-500 text-sm">
                       {t(`validation.${errors[field.id]?.type}`, {
                         field: t(`request.${field.id}`),
                         max: field.id === 'fullName' ? 100 : undefined
@@ -196,15 +193,13 @@ export const RequestDataPageByAnima = ({
                 <Textarea
                   id="dataType"
                   {...register("dataType")}
-                  aria-invalid={errors.dataType ? "true" : "false"}
-                  aria-describedby="dataType-error"
                   placeholder={t('request.placeholder.dataType')}
                   className={`h-[100px] bg-white border-gray-200 font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none ${
-                    errors.dataType ? "border-red-500 focus:ring-red-500" : "focus:ring-blue-500"
+                    errors.dataType ? "border-red-500" : ""
                   }`}
                 />
                 {errors.dataType && (
-                  <span id="dataType-error" role="alert" className="text-red-500 text-sm">
+                  <span className="text-red-500 text-sm">
                     {t('validation.required', { field: t('request.dataType') })}
                   </span>
                 )}
@@ -221,15 +216,13 @@ export const RequestDataPageByAnima = ({
                 <Textarea
                   id="additionalDetails"
                   {...register("additionalDetails")}
-                  aria-invalid={errors.additionalDetails ? "true" : "false"}
-                  aria-describedby="additionalDetails-error"
                   placeholder={t('request.placeholder.additionalDetails')}
                   className={`h-[100px] bg-white border-gray-200 font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none ${
-                    errors.additionalDetails ? "border-red-500 focus:ring-red-500" : "focus:ring-blue-500"
+                    errors.additionalDetails ? "border-red-500" : ""
                   }`}
                 />
                 {errors.additionalDetails && (
-                  <span id="additionalDetails-error" role="alert" className="text-red-500 text-sm">
+                  <span className="text-red-500 text-sm">
                     {t('validation.maxLength', {
                       field: t('request.additionalDetails'),
                       max: 1000
@@ -243,20 +236,19 @@ export const RequestDataPageByAnima = ({
             <Button
               type="submit"
               disabled={isSubmitting}
-              className={`h-12 font-alliance font-medium text-white text-base transition-colors
-                ${isSubmitting ? "bg-[#234ad9]/70" : "bg-[#234ad9] hover:bg-[#1e3eb8] active:bg-[#183099]"}`}
+              className="h-12 font-alliance font-medium text-white text-base bg-[#234ad9] hover:bg-[#1e3eb8] active:bg-[#183099] transition-colors"
             >
               {isSubmitting ? t('request.submitting') : t('request.submit')}
             </Button>
 
             {/* Form status messages */}
             {submitStatus === "success" && (
-              <div role="alert" className="text-green-500 text-sm text-center mt-2">
+              <div className="text-green-500 text-sm text-center mt-2">
                 {t('request.success')}
               </div>
             )}
             {submitStatus === "error" && (
-              <div role="alert" className="text-red-500 text-sm text-center mt-2">
+              <div className="text-red-500 text-sm text-center mt-2">
                 {t('request.error')}
               </div>
             )}
