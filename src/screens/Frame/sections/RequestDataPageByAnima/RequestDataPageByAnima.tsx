@@ -157,13 +157,13 @@ export const RequestDataPageByAnima = ({
             {/* Form fields */}
             <div className="flex flex-col gap-6">
               {/* Map through standard input fields */}
-              {formFields.map((field) => field.required ? (
+              {formFields.map((field) => (
                 <div key={field.id} className="flex flex-col gap-2">
                   <Label
                     htmlFor={field.id}
                     className="font-alliance font-normal text-gray-700 text-sm leading-[16.8px]"
                   >
-                    {field.label} *
+                    {field.label}
                   </Label>
                   <Input
                     id={field.id}
