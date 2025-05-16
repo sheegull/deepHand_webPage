@@ -202,59 +202,63 @@ export const HeroSectionByAnima = ({
           <Card className="w-full md:w-[460px] bg-[#ffffff10] rounded-2xl shadow-[0px_0px_40px_#0000004d] border-none">
             <CardHeader className="px-8 pt-8 pb-0">
               <CardTitle className="font-alliance font-normal text-white text-2xl leading-[28.8px]">
-                Get in Touch
+                {t('contact.title')}
               </CardTitle>
               <CardDescription className="font-alliance font-light text-[#aaaaaa] text-sm leading-[16.8px]">
-                Fill out the form below to learn more about DeepHand.
+                {t('contact.subtitle')}
               </CardDescription>
             </CardHeader>
             <CardContent className="px-8 pt-6">
               <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
                 <div className="flex flex-col gap-2">
                   <label className="font-alliance font-normal text-slate-200 text-sm leading-[16.8px]">
-                    Name *
+                    {t('contact.name')} *
                   </label>
                   <Input
                     {...register("name")}
-                    placeholder="Taro Fuji"
+                    placeholder={t('contact.placeholder.name')}
                     className={`h-12 bg-[#ffffff10] rounded-lg border ${
                       errors.name ? "border-red-500" : "border-white/20"
                     } text-white placeholder:text-white/50 font-light text-sm`}
                   />
                   {errors.name && (
-                    <span className="text-red-500 text-sm">{errors.name.message as string}</span>
+                    <span className="text-red-500 text-sm">
+                      {t('validation.required', { field: t('contact.name') })}
+                    </span>
                   )}
                 </div>
 
                 <div className="flex flex-col gap-2">
                   <label className="font-alliance font-normal text-slate-200 text-sm leading-[16.8px]">
-                    Email *
+                    {t('contact.email')} *
                   </label>
                   <Input
                     {...register("email")}
-                    placeholder="taro@example.com"
+                    placeholder={t('contact.placeholder.email')}
                     className={`h-12 bg-[#ffffff10] rounded-lg border ${
                       errors.email ? "border-red-500" : "border-white/20"
                     } text-white placeholder:text-white/50 font-light text-sm`}
                   />
                   {errors.email && (
-                    <span className="text-red-500 text-sm">{errors.email.message as string}</span>
+                    <span className="text-red-500 text-sm">{t('validation.email')}</span>
                   )}
                 </div>
 
                 <div className="flex flex-col gap-2">
                   <label className="font-alliance font-normal text-slate-200 text-sm leading-[16.8px]">
-                    Message *
+                    {t('contact.message')} *
                   </label>
                   <Textarea
                     {...register("message")}
-                    placeholder="What's up?"
+                    placeholder={t('contact.placeholder.message')}
                     className={`h-[100px] bg-[#ffffff10] rounded-lg border ${
                       errors.message ? "border-red-500" : "border-white/20"
                     } text-white placeholder:text-white/50 font-light text-sm`}
                   />
                   {errors.message && (
-                    <span className="text-red-500 text-sm">{errors.message.message as string}</span>
+                    <span className="text-red-500 text-sm">
+                      {t('validation.required', { field: t('contact.message') })}
+                    </span>
                   )}
                 </div>
 
@@ -268,17 +272,17 @@ export const HeroSectionByAnima = ({
                         : "bg-[#234ad9] hover:bg-[#1e3eb8] active:bg-[#183099]"
                     }`}
                 >
-                  {isSubmitting ? "Submitting..." : "Submit"}
+                  {isSubmitting ? t('contact.submitting') : t('contact.submit')}
                 </Button>
 
                 {submitStatus === "success" && (
                   <p className="text-green-500 text-sm text-center mt-2">
-                    Message sent successfully!
+                    {t('contact.success')}
                   </p>
                 )}
                 {submitStatus === "error" && (
                   <p className="text-red-500 text-sm text-center mt-2">
-                    Failed to send message. Please try again.
+                    {t('contact.error')}
                   </p>
                 )}
               </form>

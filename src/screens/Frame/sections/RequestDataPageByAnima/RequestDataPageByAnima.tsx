@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { requestFormSchema } from "../../../../lib/schema";
@@ -17,6 +18,7 @@ export const RequestDataPageByAnima = ({
   onLogoClick,
   onFooterClick,
 }: RequestDataPageByAnimaProps): JSX.Element => {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [submitStatus, setSubmitStatus] = React.useState<"idle" | "success" | "error">("idle");
 
@@ -60,32 +62,32 @@ export const RequestDataPageByAnima = ({
   const formFields = [
     {
       id: "fullName",
-      label: "Full name *",
-      placeholder: "Taro Fuji",
+      label: `${t('request.fullName')} *`,
+      placeholder: t('request.placeholder.fullName'),
       required: true,
     },
     {
       id: "companyName",
-      label: "Company Name",
-      placeholder: "Robotics Co.",
+      label: t('request.companyName'),
+      placeholder: t('request.placeholder.companyName'),
       required: false,
     },
     {
       id: "workEmail",
-      label: "Work Email *",
-      placeholder: "taro@example.com",
+      label: `${t('request.workEmail')} *`,
+      placeholder: t('request.placeholder.workEmail'),
       required: true,
     },
     {
       id: "dataAmount",
-      label: "How much data do you need? *",
-      placeholder: "10000",
+      label: `${t('request.dataAmount')} *`,
+      placeholder: t('request.placeholder.dataAmount'),
       required: true,
     },
     {
       id: "deadline",
-      label: "When do you need the data by? *",
-      placeholder: "Within the next 2 weeks",
+      label: `${t('request.deadline')} *`,
+      placeholder: t('request.placeholder.deadline'),
       required: true,
     },
   ];
@@ -144,10 +146,10 @@ export const RequestDataPageByAnima = ({
             {/* Header */}
             <div className="flex flex-col gap-2">
               <h2 className="font-alliance font-semibold text-gray-900 text-xl md:text-2xl leading-[28.8px]">
-                Request annotated data for your project
+                {t('request.title')}
               </h2>
               <p className="font-alliance font-normal text-gray-500 text-base leading-[19.2px]">
-                Tell us a bit about yourself.
+                {t('request.subtitle')}
               </p>
             </div>
 
@@ -174,7 +176,10 @@ export const RequestDataPageByAnima = ({
                   />
                   {errors[field.id] && (
                     <span id={`${field.id}-error`} role="alert" className="text-red-500 text-sm">
-                      {errors[field.id]?.message as string}
+                      {t(`validation.${errors[field.id]?.type}`, {
+                        field: t(`request.${field.id}`),
+                        max: field.id === 'fullName' ? 100 : undefined
+                      })}
                     </span>
                   )}
                 </div>
@@ -186,21 +191,21 @@ export const RequestDataPageByAnima = ({
                   htmlFor="dataType"
                   className="font-alliance font-normal text-gray-700 text-sm leading-[16.8px]"
                 >
-                  What type of data do you need? *
+                  {t('request.dataType')} *
                 </Label>
                 <Textarea
                   id="dataType"
                   {...register("dataType")}
                   aria-invalid={errors.dataType ? "true" : "false"}
                   aria-describedby="dataType-error"
-                  placeholder="Data types"
+                  placeholder={t('request.placeholder.dataType')}
                   className={`h-[100px] bg-white border-gray-200 font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none ${
                     errors.dataType ? "border-red-500 focus:ring-red-500" : "focus:ring-blue-500"
                   }`}
                 />
                 {errors.dataType && (
                   <span id="dataType-error" role="alert" className="text-red-500 text-sm">
-                    {errors.dataType.message as string}
+                    {t('validation.required', { field: t('request.dataType') })}
                   </span>
                 )}
               </div>
@@ -211,21 +216,24 @@ export const RequestDataPageByAnima = ({
                   htmlFor="additionalDetails"
                   className="font-alliance font-normal text-gray-700 text-sm leading-[16.8px]"
                 >
-                  Please share any other details.
+                  {t('request.additionalDetails')}
                 </Label>
                 <Textarea
                   id="additionalDetails"
                   {...register("additionalDetails")}
                   aria-invalid={errors.additionalDetails ? "true" : "false"}
                   aria-describedby="additionalDetails-error"
-                  placeholder="What's up?"
+                  placeholder={t('request.placeholder.additionalDetails')}
                   className={`h-[100px] bg-white border-gray-200 font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none ${
                     errors.additionalDetails ? "border-red-500 focus:ring-red-500" : "focus:ring-blue-500"
                   }`}
                 />
                 {errors.additionalDetails && (
                   <span id="additionalDetails-error" role="alert" className="text-red-500 text-sm">
-                    {errors.additionalDetails.message as string}
+                    {t('validation.maxLength', {
+                      field: t('request.additionalDetails'),
+                      max: 1000
+                    })}
                   </span>
                 )}
               </div>
@@ -242,18 +250,18 @@ export const RequestDataPageByAnima = ({
                     : "bg-[#234ad9] hover:bg-[#1e3eb8] active:bg-[#183099]"
                 }`}
             >
-              {isSubmitting ? "Submitting..." : "Submit"}
+              {isSubmitting ? t('request.submitting') : t('request.submit')}
             </Button>
 
             {/* Form status messages */}
             {submitStatus === "success" && (
               <div role="alert" className="text-green-500 text-sm text-center mt-2">
-                Your request has been submitted successfully!
+                {t('request.success')}
               </div>
             )}
             {submitStatus === "error" && (
               <div role="alert" className="text-red-500 text-sm text-center mt-2">
-                Failed to submit request. Please try again.
+                {t('request.error')}
               </div>
             )}
           </CardContent>
