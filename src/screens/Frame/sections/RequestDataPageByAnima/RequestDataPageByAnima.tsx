@@ -21,19 +21,21 @@ export const RequestDataPageByAnima = ({
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [submitStatus, setSubmitStatus] = React.useState<"idle" | "success" | "error">("idle");
-
+  const [showValidation, setShowValidation] = React.useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
   } = useForm({
+    mode: "onChange",
     resolver: zodResolver(requestFormSchema),
   });
 
   const onSubmit = async (data: any) => {
     setIsSubmitting(true);
     setSubmitStatus("idle");
+    setShowValidation(true);
 
     try {
       const response = await fetch("https://deephand-forms.workers.dev/api/request-data", {
@@ -155,23 +157,23 @@ export const RequestDataPageByAnima = ({
             {/* Form fields */}
             <div className="flex flex-col gap-6">
               {/* Map through standard input fields */}
-              {formFields.map((field) => (
+              {formFields.map((field) => field.required ? (
                 <div key={field.id} className="flex flex-col gap-2">
                   <Label
                     htmlFor={field.id}
                     className="font-alliance font-normal text-gray-700 text-sm leading-[16.8px]"
                   >
-                    {field.label}
+                    {field.label} *
                   </Label>
                   <Input
                     id={field.id}
                     {...register(field.id)}
                     placeholder={field.placeholder}
-                    className={`h-12 bg-white border-gray-200 font-light text-gray-900 placeholder:text-gray-400 text-sm ${
-                      errors[field.id] ? "border-red-500" : ""
+                    className={`h-12 bg-white font-light text-gray-900 placeholder:text-gray-400 text-sm ${
+                      errors[field.id] && showValidation ? "border-red-500 focus:border-red-500" : "border-gray-200"
                     }`}
                   />
-                  {errors[field.id] && (
+                  {errors[field.id] && showValidation && (
                     <span className="text-red-500 text-sm">
                       {t(`validation.${errors[field.id]?.type}`, {
                         field: t(`request.${field.id}`),
@@ -194,11 +196,11 @@ export const RequestDataPageByAnima = ({
                   id="dataType"
                   {...register("dataType")}
                   placeholder={t('request.placeholder.dataType')}
-                  className={`h-[100px] bg-white border-gray-200 font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none ${
-                    errors.dataType ? "border-red-500" : ""
+                  className={`h-[100px] bg-white font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none ${
+                    errors.dataType && showValidation ? "border-red-500 focus:border-red-500" : "border-gray-200"
                   }`}
                 />
-                {errors.dataType && (
+                {errors.dataType && showValidation && (
                   <span className="text-red-500 text-sm">
                     {t('validation.required', { field: t('request.dataType') })}
                   </span>
@@ -217,11 +219,11 @@ export const RequestDataPageByAnima = ({
                   id="additionalDetails"
                   {...register("additionalDetails")}
                   placeholder={t('request.placeholder.additionalDetails')}
-                  className={`h-[100px] bg-white border-gray-200 font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none ${
-                    errors.additionalDetails ? "border-red-500" : ""
+                  className={`h-[100px] bg-white font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none ${
+                    errors.additionalDetails && showValidation ? "border-red-500 focus:border-red-500" : "border-gray-200"
                   }`}
                 />
-                {errors.additionalDetails && (
+                {errors.additionalDetails && showValidation && (
                   <span className="text-red-500 text-sm">
                     {t('validation.maxLength', {
                       field: t('request.additionalDetails'),
