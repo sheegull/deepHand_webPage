@@ -109,7 +109,10 @@ export const HeroSectionByAnima = ({
             aria-label="Toggle menu"
             aria-expanded={isMenuOpen}
           >
-            <Menu className="w-6 h-6" />
+            <div className="flex items-center gap-2">
+              <LanguageToggle />
+              <Menu className="w-6 h-6" />
+            </div>
           </button>
 
           {/* Desktop Navigation */}
@@ -166,13 +169,13 @@ export const HeroSectionByAnima = ({
             ))}
             <div className="flex flex-col gap-2 mt-2 p-2 border-t border-gray-700">
               <Button className="w-full h-11 bg-white text-[#1e1e1e] border-2 border-white rounded-md font-alliance font-normal text-sm hover:bg-[#1e1e1e] hover:text-white active:bg-[#1e1e1e] active:text-white transition-colors">
-                Get Started
+                {t('nav.getStarted')}
               </Button>
               <Button
                 variant="outline"
                 className="w-full h-11 bg-[#1e1e1e] text-white rounded-md border-2 border-white hover:bg-white/20 active:bg-white/30 transition-colors font-alliance font-light text-sm"
               >
-                Login
+                {t('nav.login')}
               </Button>
             </div>
           </nav>
