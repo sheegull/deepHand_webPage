@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Menu } from "lucide-react";
@@ -19,6 +20,7 @@ import {
   NavigationMenuList,
 } from "../../../../components/ui/navigation-menu";
 import { Textarea } from "../../../../components/ui/textarea";
+import { LanguageToggle } from "../../../../components/ui/language-toggle";
 
 interface HeroSectionByAnimaProps {
   onRequestClick: () => void;
@@ -33,6 +35,7 @@ export const HeroSectionByAnima = ({
   onLogoClick,
   isLoading,
 }: HeroSectionByAnimaProps): JSX.Element => {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [submitStatus, setSubmitStatus] = React.useState<"idle" | "success" | "error">("idle");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -74,16 +77,16 @@ export const HeroSectionByAnima = ({
 
   // Navigation links data
   const navLinks = [
-    { text: "Solutions", href: "#" },
-    { text: "Resources", href: "#" },
-    { text: "Pricing", href: "#" },
-    { text: "About us", href: "#" },
+    { text: t('nav.solutions'), href: "#" },
+    { text: t('nav.resources'), href: "#" },
+    { text: t('nav.pricing'), href: "#" },
+    { text: t('nav.aboutUs'), href: "#" },
   ];
 
   // Footer links data
   const footerLinks = [
-    { text: "Terms of service", href: "#" },
-    { text: "Privacy policy", href: "#" },
+    { text: t('footer.termsOfService'), href: "#" },
+    { text: t('footer.privacyPolicy'), href: "#" },
   ];
 
   return (
@@ -128,18 +131,19 @@ export const HeroSectionByAnima = ({
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center gap-2 md:gap-4">
+            <LanguageToggle />
             <Button
               onClick={() => onNavClick('get-started')}
               className="w-[100px] h-11 bg-white text-[#1e1e1e] border-2 border-white rounded-md font-alliance font-normal text-sm hover:bg-[#1e1e1e] hover:text-white active:bg-[#1e1e1e] active:text-white transition-colors"
             >
-              Get Started
+              {t('nav.getStarted')}
             </Button>
             <Button
               onClick={() => onNavClick('login')}
               variant="outline"
               className="w-[80px] md:w-[100px] h-11 bg-[#1e1e1e] text-white rounded-md border-2 border-white hover:bg-white/20 active:bg-white/30 transition-colors font-alliance font-light text-sm"
             >
-              Login
+              {t('nav.login')}
             </Button>
           </div>
         </div>
@@ -181,18 +185,16 @@ export const HeroSectionByAnima = ({
           {/* Left Content */}
           <div className="flex flex-col max-w-[654px] gap-10 text-center md:text-left">
             <h1 className="font-alliance font-normal text-white text-4xl md:text-[64px] leading-[1.1] mt-[65px]">
-              Power Robotics <br />
-              with Rich Human Data.
+              {t('hero.title')}
             </h1>
             <p className="font-alliance font-light text-zinc-400 text-lg md:text-xl leading-[30px] max-w-[555px]">
-              DeepHand is a team of annotation experts centered on robotics. We deliver high-quality
-              annotated data.
+              {t('hero.subtitle')}
             </p>
             <Button
               onClick={onRequestClick}
               className="w-40 h-[52px] bg-[#234ad9] text-white rounded-md font-alliance font-medium text-base mx-auto md:mx-0 hover:bg-[#1e3eb8] active:bg-[#183099] transition-colors"
             >
-              Request Data
+              {t('hero.requestButton')}
             </Button>
           </div>
 
