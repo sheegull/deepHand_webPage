@@ -23,10 +23,11 @@ export const RequestDataPageByAnima = ({
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid, isDirty },
     reset,
   } = useForm({
     resolver: zodResolver(requestFormSchema),
+    mode: 'onChange',
   });
 
   const onSubmit = async (data: any) => {
@@ -165,12 +166,15 @@ export const RequestDataPageByAnima = ({
                     id={field.id}
                     {...register(field.id)}
                     placeholder={field.placeholder}
+                    aria-invalid={errors[field.id] ? "true" : "false"}
+                    aria-describedby={`${field.id}-error`}
                     className={`h-12 bg-white border-gray-200 font-light text-gray-900 placeholder:text-gray-400 text-sm ${
                       errors[field.id] ? "border-red-500" : ""
+                      errors[field.id] ? "focus:ring-red-500" : "focus:ring-blue-500"
                     }`}
                   />
                   {errors[field.id] && (
-                    <span className="text-red-500 text-sm">
+                    <span id={`${field.id}-error`} role="alert" className="text-red-500 text-sm">
                       {errors[field.id]?.message as string}
                     </span>
                   )}
@@ -188,13 +192,18 @@ export const RequestDataPageByAnima = ({
                 <Textarea
                   id="dataType"
                   {...register("dataType")}
+                  aria-invalid={errors.dataType ? "true" : "false"}
+                  aria-describedby="dataType-error"
                   placeholder="Data types"
                   className={`h-[100px] bg-white border-gray-200 font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none ${
                     errors.dataType ? "border-red-500" : ""
+                    errors.dataType ? "focus:ring-red-500" : "focus:ring-blue-500"
                   }`}
                 />
                 {errors.dataType && (
-                  <span className="text-red-500 text-sm">{errors.dataType.message as string}</span>
+                  <span id="dataType-error" role="alert" className="text-red-500 text-sm">
+                    {errors.dataType.message as string}
+                  </span>
                 )}
               </div>
 
@@ -209,19 +218,28 @@ export const RequestDataPageByAnima = ({
                 <Textarea
                   id="additionalDetails"
                   {...register("additionalDetails")}
+                  aria-invalid={errors.additionalDetails ? "true" : "false"}
+                  aria-describedby="additionalDetails-error"
                   placeholder="What's up?"
-                  className="h-[100px] bg-white border-gray-200 font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none"
+                  className={`h-[100px] bg-white border-gray-200 font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none ${
+                    errors.additionalDetails ? "border-red-500 focus:ring-red-500" : "focus:ring-blue-500"
+                  }`}
                 />
+                {errors.additionalDetails && (
+                  <span id="additionalDetails-error" role="alert" className="text-red-500 text-sm">
+                    {errors.additionalDetails.message as string}
+                  </span>
+                )}
               </div>
             </div>
 
             {/* Submit button */}
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !isDirty || !isValid}
               className={`h-12 font-alliance font-medium text-white text-base transition-colors
                 ${
-                  isSubmitting
+                  isSubmitting || !isDirty || !isValid
                     ? "bg-[#234ad9]/70"
                     : "bg-[#234ad9] hover:bg-[#1e3eb8] active:bg-[#183099]"
                 }`}
@@ -229,13 +247,14 @@ export const RequestDataPageByAnima = ({
               {isSubmitting ? "Submitting..." : "Submit"}
             </Button>
 
+            {/* Form status messages */}
             {submitStatus === "success" && (
-              <div className="text-green-500 text-sm text-center mt-2">
+              <div role="alert" className="text-green-500 text-sm text-center mt-2">
                 Your request has been submitted successfully!
               </div>
             )}
             {submitStatus === "error" && (
-              <div className="text-red-500 text-sm text-center mt-2">
+              <div role="alert" className="text-red-500 text-sm text-center mt-2">
                 Failed to submit request. Please try again.
               </div>
             )}
