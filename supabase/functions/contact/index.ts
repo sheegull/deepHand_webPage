@@ -13,6 +13,9 @@ interface ContactFormData {
   message: string;
 }
 
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 5000; // 5 seconds
+
 Deno.serve(async (req) => {
   // Handle CORS
   if (req.method === "OPTIONS") {
@@ -36,18 +39,40 @@ Deno.serve(async (req) => {
     // Parse request body
     const data: ContactFormData = await req.json();
 
-    // Insert into contact_submissions table
-    const { error } = await supabaseClient
+    // Start a transaction
+    const { data: submission, error: submissionError } = await supabaseClient
       .from("contact_submissions")
       .insert({
         name: data.name,
         email: data.email,
         message: data.message,
         ip_address: req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip"),
+      })
+      .select()
+      .single();
+
+    if (submissionError) {
+      throw submissionError;
+    }
+
+    // Queue email
+    const { error: emailError } = await supabaseClient
+      .from("email_queue")
+      .insert({
+        to_address: "contact@deephandai.com",
+        subject: "New Contact Form Submission",
+        body: `
+Name: ${data.name}
+Email: ${data.email}
+Message: ${data.message}
+
+Submission ID: ${submission.id}
+        `.trim(),
       });
 
-    if (error) {
-      throw error;
+    if (emailError) {
+      console.error("Failed to queue email:", emailError);
+      // Don't throw here - the form submission was successful
     }
 
     return new Response(
