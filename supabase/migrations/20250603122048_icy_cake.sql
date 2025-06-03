@@ -22,16 +22,13 @@ CREATE INDEX IF NOT EXISTS idx_system_config_key ON system_config (key);
 
 -- Reschedule cron job with correct settings
 SELECT cron.unschedule('process-email-queue');
+-- 毎分実行するジョブを再登録
 SELECT cron.schedule(
   'process-email-queue',
-  '* * * * *',  -- every minute
+  '* * * * *',
   $$
   SELECT net.http_post(
-    url := (SELECT value FROM system_config WHERE key = 'edge_function_base_url') || '/email-processor',
-    headers := json_build_object(
-      'Authorization',
-      'Bearer ' || (SELECT value FROM system_config WHERE key = 'anon_key')
-    )::jsonb
+    url := (SELECT value FROM system_config WHERE key = 'edge_function_base_url') || '/email-processor'
   ) AS request_id;
   $$
 );
