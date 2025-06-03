@@ -90,6 +90,39 @@ Deno.serve(async (req) => {
       throw error;
     }
 
+    // Get admin email template
+    const { data: template } = await supabaseClient
+      .from('email_templates')
+      .select('subject, body')
+      .eq('name', 'contact_admin_notification')
+      .single();
+
+    if (template) {
+      // Process template with form data
+      const templateData = {
+        name: data.name,
+        email: data.email,
+        message: data.message,
+        created_at: new Date().toISOString(),
+        ip_address: ipAddress
+      };
+
+      const { data: processedBody } = await supabaseClient
+        .rpc('process_email_template', {
+          template_name: 'contact_admin_notification',
+          template_data: templateData
+        });
+
+      // Queue email
+      await supabaseClient
+        .from('email_queue')
+        .insert({
+          to_address: 'contact@deephandai.com',
+          subject: template.subject,
+          body: processedBody,
+        });
+    }
+
     // Mark submission as successful
     await supabaseClient
       .from("email_submissions")
