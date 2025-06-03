@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { createMimeMessage } from "npm:mimetext@3.0.27";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -41,6 +42,8 @@ Deno.serve(async (req) => {
     // Parse request body
     const data: ContactFormData = await req.json();
     const ipAddress = req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip");
+
+    const adminEmail = Deno.env.get("ADMIN_EMAIL") ?? "";
 
     // Check rate limit
     const { data: rateLimitData, error: rateLimitError } = await supabaseClient
@@ -88,6 +91,55 @@ Deno.serve(async (req) => {
 
     if (error) {
       throw error;
+    }
+    
+    // Queue admin notification email
+    const { data: adminTemplate } = await supabaseClient
+      .from('email_templates')
+      .select('id, subject, body')
+      .eq('name', 'contact_admin_notification')
+      .single();
+
+    if (adminTemplate) {
+      const adminEmailBody = await supabaseClient
+        .rpc('process_email_template', {
+          template_name: 'contact_admin_notification',
+          template_data: {
+            name: data.name,
+            email: data.email,
+            message: data.message,
+            created_at: new Date().toISOString(),
+            ip_address: ipAddress
+          }
+        })
+        .single();
+
+      await supabaseClient
+        .from('email_queue')
+        .insert({
+          to_address: adminEmail,
+          subject: adminTemplate.subject,
+          body: adminEmailBody.data,
+          template_id: adminTemplate.id
+        });
+    }
+
+    // Queue auto-reply email
+    const { data: autoReplyTemplate } = await supabaseClient
+      .from('email_templates')
+      .select('id, subject, body')
+      .eq('name', 'contact_auto_reply')
+      .single();
+
+    if (autoReplyTemplate) {
+      await supabaseClient
+        .from('email_queue')
+        .insert({
+          to_address: data.email,
+          subject: autoReplyTemplate.subject,
+          body: autoReplyTemplate.body,
+          template_id: autoReplyTemplate.id
+        });
     }
 
     // Mark submission as successful
