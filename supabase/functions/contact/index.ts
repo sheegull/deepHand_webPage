@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
       .gte('created_at', new Date(Date.now() - 3600000).toISOString())
       .order('created_at', { ascending: false });
 
-    if (rateLimit && rateLimit.length >= 5) {
+    if (rateLimit && rateLimit.length >= 10) {
       return new Response(
         JSON.stringify({ 
           error: 'Rate limit exceeded. Please try again later.' 
