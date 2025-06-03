@@ -43,7 +43,14 @@ Deno.serve(async (req) => {
     const data: ContactFormData = await req.json();
     const ipAddress = req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip");
 
-    const adminEmail = Deno.env.get("ADMIN_EMAIL") ?? "";
+    // Get admin email from system_config
+    const { data: adminEmail } = await supabaseClient
+      .rpc('get_config', { config_key: 'admin_email' })
+      .single();
+
+    if (!adminEmail) {
+      throw new Error('Admin email not configured');
+    }
 
     // Check rate limit
     const { data: rateLimitData, error: rateLimitError } = await supabaseClient
