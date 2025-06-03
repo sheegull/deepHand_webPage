@@ -13,6 +13,11 @@ interface ContactFormData {
   message: string;
 }
 
+interface RateLimitCheck {
+  allowed: boolean;
+  wait_time: string;
+}
+
 Deno.serve(async (req) => {
   // Handle CORS
   if (req.method === "OPTIONS") {
@@ -35,6 +40,41 @@ Deno.serve(async (req) => {
 
     // Parse request body
     const data: ContactFormData = await req.json();
+    const ipAddress = req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip");
+
+    // Check rate limit
+    const { data: rateLimitData, error: rateLimitError } = await supabaseClient
+      .rpc('check_email_rate_limit', { check_email: data.email })
+      .single();
+
+    if (rateLimitError) {
+      throw rateLimitError;
+    }
+
+    const rateLimit = rateLimitData as RateLimitCheck;
+    if (!rateLimit.allowed) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Rate limit exceeded',
+          waitTime: rateLimit.wait_time
+        }),
+        {
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+          status: 429,
+        }
+      );
+    }
+
+    // Record submission attempt
+    await supabaseClient
+      .from("email_submissions")
+      .insert({
+        email: data.email,
+        ip_address: ipAddress,
+      });
 
     // Insert into contact_submissions table
     const { error } = await supabaseClient
@@ -43,12 +83,20 @@ Deno.serve(async (req) => {
         name: data.name,
         email: data.email,
         message: data.message,
-        ip_address: req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip"),
+        ip_address: ipAddress,
       });
 
     if (error) {
       throw error;
     }
+
+    // Mark submission as successful
+    await supabaseClient
+      .from("email_submissions")
+      .update({ success: true })
+      .eq("email", data.email)
+      .order("created_at", { ascending: false })
+      .limit(1);
 
     return new Response(
       JSON.stringify({ message: "Contact form submitted successfully" }),
