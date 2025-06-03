@@ -13,6 +13,15 @@ Deno.serve(async (_req) => {
       }
     );
 
+    // Get MailChannels API key from system config
+    const { data: apiKey } = await supabaseClient
+      .rpc('get_config', { config_key: 'mailchannels_api_key' })
+      .single();
+
+    if (!apiKey) {
+      throw new Error('MailChannels API key not configured');
+    }
+
     // Get pending emails
     const { data: pendingEmails, error: fetchError } = await supabaseClient
       .from('email_queue')
@@ -49,7 +58,7 @@ Deno.serve(async (_req) => {
           method: "POST",
           headers: {
             "content-type": "application/json",
-            "Authorization": `Bearer ${Deno.env.get("MAILCHANNELS_API_KEY")}`,
+            "Authorization": `Bearer ${apiKey}`,
           },
           body: JSON.stringify(msg.asRaw()),
         });
