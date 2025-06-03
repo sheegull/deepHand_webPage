@@ -19,11 +19,21 @@ Deno.serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
+    // Check queue health first
+    const { data: health } = await supabaseClient
+      .rpc('check_email_queue_health')
+      .single();
+    
+    console.log('Queue health status:', health);
+
     // Get pending emails
     const { data: emails, error: fetchError } = await supabaseClient
       .from('email_queue')
       .select('*')
       .eq('status', 'pending')
+      .lt('attempts', 3)  // Only process messages with less than 3 attempts
+      .is('next_attempt_at', null)  // Or where next attempt time has passed
+      .or('next_attempt_at.lt.now()')
       .order('created_at', { ascending: true })
       .limit(10);
 
@@ -37,8 +47,18 @@ Deno.serve(async (req) => {
     // Process each email
     for (const email of emails) {
       try {
+        // Update attempt tracking before sending
+        await supabaseClient
+          .from('email_queue')
+          .update({ 
+            attempts: email.attempts + 1,
+            last_attempt_at: new Date().toISOString(),
+            status: 'processing'
+          })
+          .eq('id', email.id);
+
         const msg = createMimeMessage();
-        msg.setSender({ addr: "noreply@deephandai.com" });
+        msg.setSender({ addr: "noreply@deephand.pages.dev" });
         msg.setRecipient(email.to_address);
         msg.setSubject(email.subject);
         msg.setMessage(email.body);
@@ -48,7 +68,7 @@ Deno.serve(async (req) => {
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({
             personalizations: [{ to: [{ email: email.to_address }] }],
-            from: { email: "noreply@deephandai.com", name: "DeepHand" },
+            from: { email: "noreply@deephand.pages.dev", name: "DeepHand" },
             subject: email.subject,
             content: [{ type: "text/plain", value: email.body }],
           }),
@@ -60,19 +80,25 @@ Deno.serve(async (req) => {
           .update({ 
             status: 'sent',
             sent_at: new Date().toISOString(),
+            error: null,
+            last_error_details: null
           })
           .eq('id', email.id);
 
       } catch (error) {
         console.error(`Failed to send email ${email.id}:`, error);
         
+        const nextAttemptDelay = Math.pow(2, email.attempts) * 5 * 60 * 1000; // Exponential backoff
+        const nextAttemptAt = new Date(Date.now() + nextAttemptDelay);
+
         // Update attempt count and status
         await supabaseClient
           .from('email_queue')
           .update({ 
             status: 'failed',
-            attempts: email.attempts + 1,
-            error: error.message
+            error: error.message,
+            last_error_details: JSON.stringify(error),
+            next_attempt_at: nextAttemptAt.toISOString()
           })
           .eq('id', email.id);
       }
