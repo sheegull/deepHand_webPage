@@ -1,5 +1,10 @@
 // API configuration
 const getApiBaseUrl = (): string => {
+  // Check if there's a custom API URL set via environment variable
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
   // Development environment (localhost)
   if (import.meta.env.DEV || window.location.hostname === 'localhost') {
     return 'http://localhost:8787';
