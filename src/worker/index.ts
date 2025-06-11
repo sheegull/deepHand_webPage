@@ -25,7 +25,16 @@ app.use("*", secureHeaders());
 app.use(
   "*",
   cors({
-    origin: ["https://deephand.pages.dev", "http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176"],
+    origin: [
+      "https://deephandai.com",           // 本番ドメイン
+      "https://www.deephandai.com",       // WWW付きバリエーション
+      "https://deephand.pages.dev",       // Cloudflare Pages
+      "https://deephand-web.pages.dev",   // 開発用Pages
+      "http://localhost:5173",            // ローカル開発
+      "http://localhost:5174",
+      "http://localhost:5175", 
+      "http://localhost:5176"
+    ],
     allowMethods: ["POST", "OPTIONS"],
     allowHeaders: ["Content-Type"],
     maxAge: 86400,
