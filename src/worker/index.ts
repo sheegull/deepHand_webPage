@@ -9,13 +9,14 @@ import { createMimeMessage } from "mimetext";
 
 interface Env {
   CONTACT_EMAIL: string;
+  MAX_REQUESTS_PER_HOUR: string;
   FORM_STORAGE: R2Bucket;
-  ANALYTICS: AnalyticsEngine;
-  NOTIFY: EmailDispatcher; // Email Workers binding
-  // …plus any KV / other bindings…
+  FORM_ANALYTICS: AnalyticsEngineDataset;
+  IP_RATE_LIMITER: KVNamespace;
+  NOTIFY: SendEmail;
 }
 
-const app = new Hono<{}, Env>();
+const app = new Hono<{ Bindings: Env }>();
 
 // Security headers
 app.use("*", secureHeaders());
@@ -24,8 +25,9 @@ app.use("*", secureHeaders());
 app.use(
   "*",
   cors({
-    origin: ["https://deephand.pages.dev", "http://localhost:5173"],
-    allowMethods: ["POST"],
+    origin: ["https://deephand.pages.dev", "http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176"],
+    allowMethods: ["POST", "OPTIONS"],
+    allowHeaders: ["Content-Type"],
     maxAge: 86400,
   })
 );
@@ -50,36 +52,80 @@ app.post("/api/contact", async (c) => {
   try {
     // Parse & validate
     const data = await c.req.json();
-    const { success, data: valid, error } = validateContactForm(sanitizeInput(data));
+    const sanitized = sanitizeInput(data);
+    const { success, data: valid, error } = validateContactForm(sanitized);
     if (!success) {
-      return c.json({ error }, 400);
+      return c.json({ error: "Validation failed", details: error }, 400);
     }
 
-    // ——— Email notification ———
-    const msg = createMimeMessage();
-    msg.setSender({ addr: "noreply@yourdomain.com" });
-    msg.setSubject("【DeepHand】新しいお問い合わせを受信しました");
-    msg.setMessage(
-      `名前: ${valid.name}\n` + `メール: ${valid.email}\n` + `メッセージ:\n${valid.message}`,
-      "text/plain"
-    );
-    await c.env.NOTIFY.send(msg);
-    // ——————————————————————
+    // Send email notification (production only)
+    if (c.env.NOTIFY) {
+      try {
+        const message = {
+          from: { email: "noreply@deephandai.com", name: "DeepHand" },
+          to: [{ email: c.env.CONTACT_EMAIL }],
+          subject: "新しいお問い合わせ - DeepHand",
+          content: [{
+            type: "text/plain",
+            value: `お名前: ${valid.name}\nご所属: ${valid.organization || 'N/A'}\nメールアドレス: ${valid.email}\nお問い合わせ内容: ${valid.message}`
+          }]
+        };
+        
+        await c.env.NOTIFY.send(message);
+      } catch (err) {
+        console.log("Email sending failed (development mode):", err);
+      }
+    } else {
+      console.log("=== 📧 EMAIL WOULD BE SENT (DEVELOPMENT MODE) ===");
+      console.log("To:", c.env.CONTACT_EMAIL || "yogoism@gmail.com");
+      console.log("From: noreply@deephandai.com");
+      console.log("Subject: 新しいお問い合わせ - DeepHand");
+      console.log("Content:");
+      console.log(`お名前: ${valid.name}`);
+      console.log(`ご所属: ${valid.organization || 'N/A'}`);
+      console.log(`メールアドレス: ${valid.email}`);
+      console.log(`お問い合わせ内容: ${valid.message}`);
+      console.log("================================================");
+    }
 
-    // R2 に保存
-    await c.env.FORM_STORAGE.put(`contact/${Date.now()}.json`, JSON.stringify(valid));
+    // Store in R2 (production only)
+    if (c.env.FORM_STORAGE) {
+      try {
+        const timestamp = Date.now();
+        await c.env.FORM_STORAGE.put(
+          `contact/${timestamp}.json`,
+          JSON.stringify({
+            ...valid,
+            timestamp,
+            type: 'contact'
+          })
+        );
+      } catch (err) {
+        console.log("R2 storage failed (development mode):", err);
+      }
+    } else {
+      console.log("Data would be stored:", { ...valid, type: 'contact' });
+    }
 
-    // Analytics
-    await c.env.ANALYTICS.writeDataPoint({
-      blobs: ["contact_form_submission"],
-      doubles: [1],
-      indexes: ["success"],
-    });
+    // Log analytics (production only)
+    if (c.env.FORM_ANALYTICS) {
+      try {
+        c.env.FORM_ANALYTICS.writeDataPoint({
+          blobs: ["contact_form_submission"],
+          doubles: [1],
+          indexes: ["success"]
+        });
+      } catch (err) {
+        console.log("Analytics failed (development mode):", err);
+      }
+    } else {
+      console.log("Analytics would be logged: contact_form_submission");
+    }
 
-    return c.json({ success: true });
+    return c.json({ success: true, message: "お問い合わせを受け付けました" });
   } catch (err: any) {
-    console.error(err);
-    return c.json({ error: err.message }, 500);
+    console.error("Contact form error:", err);
+    return c.json({ error: "送信に失敗しました", details: err.message }, 500);
   }
 });
 
@@ -87,40 +133,89 @@ app.post("/api/contact", async (c) => {
 app.post("/api/request-data", async (c) => {
   try {
     const data = await c.req.json();
-    const { success, data: valid, error } = validateRequestForm(sanitizeInput(data));
+    const sanitized = sanitizeInput(data);
+    const { success, data: valid, error } = validateRequestForm(sanitized);
     if (!success) {
-      return c.json({ error }, 400);
+      return c.json({ error: "Validation failed", details: error }, 400);
     }
 
-    // ——— Email notification ———
-    const msg = createMimeMessage();
-    msg.setSender({ addr: "noreply@yourdomain.com" });
-    msg.setSubject("【DeepHand】新しいデータリクエストを受信しました");
-    msg.setMessage(
-      `お名前: ${valid.fullName}\n` +
-        `会社名: ${valid.companyName || "（未入力）"}\n` +
-        `メール: ${valid.workEmail}\n` +
-        `データ量: ${valid.dataAmount}\n` +
-        `納期: ${valid.deadline}\n` +
-        `データ種別:\n${valid.dataType}\n` +
-        `その他詳細:\n${valid.additionalDetails || "なし"}`,
-      "text/plain"
-    );
-    await c.env.NOTIFY.send(msg);
-    // ——————————————————————
+    // Format data types for email
+    const dataTypes = Array.isArray(valid.dataType) ? valid.dataType.join(', ') : valid.dataType;
+    
+    // Send email notification (production only)
+    if (c.env.NOTIFY) {
+      try {
+        const message = {
+          from: { email: "noreply@deephandai.com", name: "DeepHand" },
+          to: [{ email: c.env.CONTACT_EMAIL }],
+          subject: "新しいデータリクエスト - DeepHand",
+          content: [{
+            type: "text/plain",
+            value: `お名前: ${valid.name}\nご所属: ${valid.organization || 'N/A'}\nメールアドレス: ${valid.email}\nご依頼の背景や目的: ${valid.backgroundPurpose}\n必要なデータ種別: ${dataTypes}\nデータの詳細: ${valid.dataDetails || 'N/A'}\n必要なデータ量: ${valid.dataVolume}\nご希望の納期: ${valid.deadline}\nご予算目安: ${valid.budget}\nその他、詳細やご要望: ${valid.otherRequirements || 'N/A'}`
+          }]
+        };
+        
+        await c.env.NOTIFY.send(message);
+      } catch (err) {
+        console.log("Email sending failed (development mode):", err);
+      }
+    } else {
+      console.log("=== 📧 DATA REQUEST EMAIL WOULD BE SENT (DEVELOPMENT MODE) ===");
+      console.log("To:", c.env.CONTACT_EMAIL || "yogoism@gmail.com");
+      console.log("From: noreply@deephandai.com");
+      console.log("Subject: 新しいデータリクエスト - DeepHand");
+      console.log("Content:");
+      console.log(`お名前: ${valid.name}`);
+      console.log(`ご所属: ${valid.organization || 'N/A'}`);
+      console.log(`メールアドレス: ${valid.email}`);
+      console.log(`ご依頼の背景や目的: ${valid.backgroundPurpose}`);
+      console.log(`必要なデータ種別: ${dataTypes}`);
+      console.log(`データの詳細: ${valid.dataDetails || 'N/A'}`);
+      console.log(`必要なデータ量: ${valid.dataVolume}`);
+      console.log(`ご希望の納期: ${valid.deadline}`);
+      console.log(`ご予算目安: ${valid.budget}`);
+      console.log(`その他、詳細やご要望: ${valid.otherRequirements || 'N/A'}`);
+      console.log("==============================================================");
+    }
 
-    await c.env.FORM_STORAGE.put(`request/${Date.now()}.json`, JSON.stringify(valid));
+    // Store in R2 (production only)
+    if (c.env.FORM_STORAGE) {
+      try {
+        const timestamp = Date.now();
+        await c.env.FORM_STORAGE.put(
+          `request/${timestamp}.json`,
+          JSON.stringify({
+            ...valid,
+            timestamp,
+            type: 'request'
+          })
+        );
+      } catch (err) {
+        console.log("R2 storage failed (development mode):", err);
+      }
+    } else {
+      console.log("Data would be stored:", { ...valid, type: 'request' });
+    }
 
-    await c.env.ANALYTICS.writeDataPoint({
-      blobs: ["data_request_submission"],
-      doubles: [1],
-      indexes: ["success"],
-    });
+    // Log analytics (production only)
+    if (c.env.FORM_ANALYTICS) {
+      try {
+        c.env.FORM_ANALYTICS.writeDataPoint({
+          blobs: ["data_request_submission"],
+          doubles: [1],
+          indexes: ["success"]
+        });
+      } catch (err) {
+        console.log("Analytics failed (development mode):", err);
+      }
+    } else {
+      console.log("Analytics would be logged: data_request_submission");
+    }
 
-    return c.json({ success: true });
+    return c.json({ success: true, message: "データリクエストを受け付けました" });
   } catch (err: any) {
-    console.error(err);
-    return c.json({ error: err.message }, 500);
+    console.error("Data request form error:", err);
+    return c.json({ error: "送信に失敗しました", details: err.message }, 500);
   }
 });
 

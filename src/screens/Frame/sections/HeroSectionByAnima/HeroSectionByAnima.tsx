@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Menu } from "lucide-react";
 import { contactFormSchema } from "../../../../lib/schema";
+import { API_ENDPOINTS, apiCall } from "../../../../lib/api";
 import { Button } from "../../../../components/ui/button";
 import {
   Card,
@@ -54,21 +55,12 @@ export const HeroSectionByAnima = ({
     setSubmitStatus("idle");
 
     try {
-      const response = await fetch("https://deephand-forms.workers.dev/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to send message");
-      }
-
+      const result = await apiCall(API_ENDPOINTS.contact, data);
+      console.log('Contact form submitted successfully:', result);
       setSubmitStatus("success");
       reset();
     } catch (error) {
+      console.error('Contact form submission failed:', error);
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
@@ -228,6 +220,24 @@ export const HeroSectionByAnima = ({
                   {errors.name && (
                     <span className="text-red-500 text-sm">
                       {t('validation.required', { field: t('contact.name') })}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="font-alliance font-normal text-slate-200 text-sm leading-[16.8px]">
+                    {t('contact.organization')}
+                  </label>
+                  <Input
+                    {...register("organization")}
+                    placeholder={t('contact.placeholder.organization')}
+                    className={`h-12 bg-[#ffffff10] rounded-lg border ${
+                      errors.organization ? "border-red-500" : "border-white/20"
+                    } text-white placeholder:text-white/50 font-light text-sm`}
+                  />
+                  {errors.organization && (
+                    <span className="text-red-500 text-sm">
+                      {t('validation.required', { field: t('contact.organization') })}
                     </span>
                   )}
                 </div>
