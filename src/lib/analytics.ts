@@ -6,20 +6,12 @@ type NavigationEvent = {
 };
 
 export const logNavigation = async (event: NavigationEvent) => {
-  try {
-    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analytics`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(event),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-  } catch (error) {
-    console.error('Failed to log navigation event:', error);
-  }
+  // Simple client-side navigation logging
+  // Analytics are handled by Cloudflare Workers backend
+  console.log('Navigation event:', {
+    from: event.from,
+    to: event.to,
+    element: event.element,
+    timestamp: new Date(event.timestamp).toISOString(),
+  });
 };
