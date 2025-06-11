@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Menu } from "lucide-react";
+import { Menu, Loader2 } from "lucide-react";
 import { contactFormSchema } from "../../../../lib/schema";
 import { API_ENDPOINTS, apiCall } from "../../../../lib/api";
 import { Button } from "../../../../components/ui/button";
@@ -53,7 +53,6 @@ export const HeroSectionByAnima = ({
   const onSubmit = async (data: any) => {
     setIsSubmitting(true);
     setSubmitStatus("idle");
-
     try {
       const result = await apiCall(API_ENDPOINTS.contact, data);
       console.log('Contact form submitted successfully:', result);
@@ -279,13 +278,9 @@ export const HeroSectionByAnima = ({
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`h-12 rounded-lg font-alliance font-medium text-white text-base mt-6 transition-colors
-                    ${
-                      isSubmitting
-                        ? "bg-[#234ad9]/70"
-                        : "bg-[#234ad9] hover:bg-[#1e3eb8] active:bg-[#183099]"
-                    }`}
+                  className="h-12 font-alliance font-medium text-white text-base bg-[#234ad9] hover:bg-[#1e3eb8] active:bg-[#183099] transition-colors disabled:bg-[#234ad9]/70 flex items-center justify-center gap-2"
                 >
+                  {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                   {isSubmitting ? t('contact.submitting') : t('contact.submit')}
                 </Button>
 
