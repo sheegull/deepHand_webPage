@@ -3,11 +3,13 @@ import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { requestFormSchema } from "../../../../lib/schema";
+import { API_ENDPOINTS, apiCall } from "../../../../lib/api";
 import { Button } from "../../../../components/ui/button";
 import { Card, CardContent } from "../../../../components/ui/card";
 import { Input } from "../../../../components/ui/input";
 import { Label } from "../../../../components/ui/label";
 import { Textarea } from "../../../../components/ui/textarea";
+import { Checkbox } from "../../../../components/ui/checkbox";
 
 interface RequestDataPageByAnimaProps {
   onLogoClick: () => void;
@@ -37,22 +39,29 @@ export const RequestDataPageByAnima = ({
     setSubmitStatus("idle");
     setShowValidation(true);
 
+    // Validate data types selection
+    if (selectedDataTypes.length === 0) {
+      setSubmitStatus("error");
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
-      const response = await fetch("https://deephand-forms.workers.dev/api/request-data", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const formData = {
+        ...data,
+        dataType: selectedDataTypes.includes("other") 
+          ? [...selectedDataTypes.filter(t => t !== "other"), `other: ${otherDataType}`]
+          : selectedDataTypes
+      };
 
-      if (!response.ok) {
-        throw new Error("Failed to submit request");
-      }
-
+      const result = await apiCall(API_ENDPOINTS.requestData, formData);
+      console.log('Data request form submitted successfully:', result);
       setSubmitStatus("success");
       reset();
+      setSelectedDataTypes([]);
+      setOtherDataType("");
     } catch (error) {
+      console.error('Data request form submission failed:', error);
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
@@ -62,36 +71,46 @@ export const RequestDataPageByAnima = ({
   // Form field data for mapping
   const formFields = [
     {
-      id: "fullName",
-      label: `${t('request.fullName')} *`,
-      placeholder: t('request.placeholder.fullName'),
+      id: "name",
+      label: `${t('request.name')} *`,
+      placeholder: t('request.placeholder.name'),
       required: true,
     },
     {
-      id: "companyName",
-      label: t('request.companyName'),
-      placeholder: t('request.placeholder.companyName'),
+      id: "organization",
+      label: t('request.organization'),
+      placeholder: t('request.placeholder.organization'),
       required: false,
     },
     {
-      id: "workEmail",
-      label: `${t('request.workEmail')} *`,
-      placeholder: t('request.placeholder.workEmail'),
-      required: true,
-    },
-    {
-      id: "dataAmount",
-      label: `${t('request.dataAmount')} *`,
-      placeholder: t('request.placeholder.dataAmount'),
-      required: true,
-    },
-    {
-      id: "deadline",
-      label: `${t('request.deadline')} *`,
-      placeholder: t('request.placeholder.deadline'),
+      id: "email",
+      label: `${t('request.email')} *`,
+      placeholder: t('request.placeholder.email'),
       required: true,
     },
   ];
+
+  const [selectedDataTypes, setSelectedDataTypes] = React.useState<string[]>([]);
+  const [otherDataType, setOtherDataType] = React.useState("");
+
+  const dataTypeOptions = [
+    { id: "text", label: t('request.dataTypeOptions.text') },
+    { id: "image", label: t('request.dataTypeOptions.image') },
+    { id: "video", label: t('request.dataTypeOptions.video') },
+    { id: "audio", label: t('request.dataTypeOptions.audio') },
+    { id: "other", label: t('request.dataTypeOptions.other') },
+  ];
+
+  const handleDataTypeChange = (typeId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedDataTypes(prev => [...prev, typeId]);
+    } else {
+      setSelectedDataTypes(prev => prev.filter(id => id !== typeId));
+      if (typeId === "other") {
+        setOtherDataType("");
+      }
+    }
+  };
 
   return (
     <div className="flex flex-col md:flex-row w-full bg-[#1e1e1e] min-h-screen">
@@ -140,10 +159,8 @@ export const RequestDataPageByAnima = ({
       {/* Right side with form */}
       <div className="w-full md:w-1/2 bg-white flex-1">
         <Card className="border-0 shadow-none h-full">
-          <CardContent
-            className="flex flex-col gap-8 p-6 md:p-20"
-            onSubmit={handleSubmit(onSubmit)}
-          >
+          <CardContent className="flex flex-col gap-8 p-6 md:p-20">
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
             {/* Header */}
             <div className="flex flex-col gap-2">
               <h2 className="font-alliance font-semibold text-gray-900 text-xl md:text-2xl leading-[28.8px]">
@@ -177,56 +194,188 @@ export const RequestDataPageByAnima = ({
                     <span className="text-red-500 text-sm">
                       {t(`validation.${errors[field.id]?.type}`, {
                         field: t(`request.${field.id}`),
-                        max: field.id === 'fullName' ? 100 : undefined
+                        max: field.id === 'name' ? 100 : undefined
                       })}
                     </span>
                   )}
                 </div>
               ))}
 
-              {/* Data type field */}
+              {/* Background and Purpose field */}
               <div className="flex flex-col gap-2">
                 <Label
-                  htmlFor="dataType"
+                  htmlFor="backgroundPurpose"
                   className="font-alliance font-normal text-gray-700 text-sm leading-[16.8px]"
                 >
-                  {t('request.dataType')} *
+                  {t('request.backgroundPurpose')} *
                 </Label>
                 <Textarea
-                  id="dataType"
-                  {...register("dataType")}
-                  placeholder={t('request.placeholder.dataType')}
+                  id="backgroundPurpose"
+                  {...register("backgroundPurpose")}
+                  placeholder={t('request.placeholder.backgroundPurpose')}
                   className={`h-[100px] bg-white font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none ${
-                    errors.dataType && showValidation ? "border-red-500 focus:border-red-500" : "border-gray-200"
+                    errors.backgroundPurpose && showValidation ? "border-red-500 focus:border-red-500" : "border-gray-200"
                   }`}
                 />
-                {errors.dataType && showValidation && (
+                {errors.backgroundPurpose && showValidation && (
+                  <span className="text-red-500 text-sm">
+                    {t('validation.required', { field: t('request.backgroundPurpose') })}
+                  </span>
+                )}
+              </div>
+
+              {/* Data type checkboxes */}
+              <div className="flex flex-col gap-2">
+                <Label className="font-alliance font-normal text-gray-700 text-sm leading-[16.8px]">
+                  {t('request.dataType')} *
+                </Label>
+                <div className="flex flex-col gap-3">
+                  {dataTypeOptions.map((option) => (
+                    <div key={option.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={option.id}
+                        checked={selectedDataTypes.includes(option.id)}
+                        onCheckedChange={(checked) => handleDataTypeChange(option.id, checked as boolean)}
+                      />
+                      <Label
+                        htmlFor={option.id}
+                        className="font-alliance font-normal text-gray-700 text-sm cursor-pointer"
+                      >
+                        {option.label}
+                      </Label>
+                    </div>
+                  ))}
+                  {selectedDataTypes.includes("other") && (
+                    <Input
+                      placeholder="具体的な内容をご記入ください / Please specify"
+                      value={otherDataType}
+                      onChange={(e) => setOtherDataType(e.target.value)}
+                      className="ml-6 h-10 bg-white font-light text-gray-900 placeholder:text-gray-400 text-sm border-gray-200"
+                    />
+                  )}
+                </div>
+                {selectedDataTypes.length === 0 && showValidation && (
                   <span className="text-red-500 text-sm">
                     {t('validation.required', { field: t('request.dataType') })}
                   </span>
                 )}
               </div>
 
-              {/* Additional details field */}
+              {/* Data details field */}
               <div className="flex flex-col gap-2">
                 <Label
-                  htmlFor="additionalDetails"
+                  htmlFor="dataDetails"
                   className="font-alliance font-normal text-gray-700 text-sm leading-[16.8px]"
                 >
-                  {t('request.additionalDetails')}
+                  {t('request.dataDetails')}
                 </Label>
                 <Textarea
-                  id="additionalDetails"
-                  {...register("additionalDetails")}
-                  placeholder={t('request.placeholder.additionalDetails')}
+                  id="dataDetails"
+                  {...register("dataDetails")}
+                  placeholder={t('request.placeholder.dataDetails')}
                   className={`h-[100px] bg-white font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none ${
-                    errors.additionalDetails && showValidation ? "border-red-500 focus:border-red-500" : "border-gray-200"
+                    errors.dataDetails && showValidation ? "border-red-500 focus:border-red-500" : "border-gray-200"
                   }`}
                 />
-                {errors.additionalDetails && showValidation && (
+                {errors.dataDetails && showValidation && (
                   <span className="text-red-500 text-sm">
                     {t('validation.maxLength', {
-                      field: t('request.additionalDetails'),
+                      field: t('request.dataDetails'),
+                      max: 1000
+                    })}
+                  </span>
+                )}
+              </div>
+
+              {/* Data volume field */}
+              <div className="flex flex-col gap-2">
+                <Label
+                  htmlFor="dataVolume"
+                  className="font-alliance font-normal text-gray-700 text-sm leading-[16.8px]"
+                >
+                  {t('request.dataVolume')} *
+                </Label>
+                <Textarea
+                  id="dataVolume"
+                  {...register("dataVolume")}
+                  placeholder={t('request.placeholder.dataVolume')}
+                  className={`h-[100px] bg-white font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none ${
+                    errors.dataVolume && showValidation ? "border-red-500 focus:border-red-500" : "border-gray-200"
+                  }`}
+                />
+                {errors.dataVolume && showValidation && (
+                  <span className="text-red-500 text-sm">
+                    {t('validation.required', { field: t('request.dataVolume') })}
+                  </span>
+                )}
+              </div>
+
+              {/* Deadline field */}
+              <div className="flex flex-col gap-2">
+                <Label
+                  htmlFor="deadline"
+                  className="font-alliance font-normal text-gray-700 text-sm leading-[16.8px]"
+                >
+                  {t('request.deadline')} *
+                </Label>
+                <Textarea
+                  id="deadline"
+                  {...register("deadline")}
+                  placeholder={t('request.placeholder.deadline')}
+                  className={`h-[100px] bg-white font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none ${
+                    errors.deadline && showValidation ? "border-red-500 focus:border-red-500" : "border-gray-200"
+                  }`}
+                />
+                {errors.deadline && showValidation && (
+                  <span className="text-red-500 text-sm">
+                    {t('validation.required', { field: t('request.deadline') })}
+                  </span>
+                )}
+              </div>
+
+              {/* Budget field */}
+              <div className="flex flex-col gap-2">
+                <Label
+                  htmlFor="budget"
+                  className="font-alliance font-normal text-gray-700 text-sm leading-[16.8px]"
+                >
+                  {t('request.budget')} *
+                </Label>
+                <Textarea
+                  id="budget"
+                  {...register("budget")}
+                  placeholder={t('request.placeholder.budget')}
+                  className={`h-[100px] bg-white font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none ${
+                    errors.budget && showValidation ? "border-red-500 focus:border-red-500" : "border-gray-200"
+                  }`}
+                />
+                {errors.budget && showValidation && (
+                  <span className="text-red-500 text-sm">
+                    {t('validation.required', { field: t('request.budget') })}
+                  </span>
+                )}
+              </div>
+
+              {/* Other requirements field */}
+              <div className="flex flex-col gap-2">
+                <Label
+                  htmlFor="otherRequirements"
+                  className="font-alliance font-normal text-gray-700 text-sm leading-[16.8px]"
+                >
+                  {t('request.otherRequirements')}
+                </Label>
+                <Textarea
+                  id="otherRequirements"
+                  {...register("otherRequirements")}
+                  placeholder={t('request.placeholder.otherRequirements')}
+                  className={`h-[100px] bg-white font-alliance font-light text-gray-900 placeholder:text-gray-400 text-sm resize-none ${
+                    errors.otherRequirements && showValidation ? "border-red-500 focus:border-red-500" : "border-gray-200"
+                  }`}
+                />
+                {errors.otherRequirements && showValidation && (
+                  <span className="text-red-500 text-sm">
+                    {t('validation.maxLength', {
+                      field: t('request.otherRequirements'),
                       max: 1000
                     })}
                   </span>
@@ -254,6 +403,7 @@ export const RequestDataPageByAnima = ({
                 {t('request.error')}
               </div>
             )}
+            </form>
           </CardContent>
         </Card>
       </div>

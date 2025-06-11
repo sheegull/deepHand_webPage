@@ -1,23 +1,37 @@
-export const submitContactForm = async (data: {
-  name: string;
-  email: string;
-  message: string;
-}) => {
-  const response = await fetch(
-    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/contact`,
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    }
-  );
+// API configuration
+const getApiBaseUrl = (): string => {
+  // Check if there's a custom API URL set via environment variable
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // Development environment (localhost)
+  if (import.meta.env.DEV || window.location.hostname === 'localhost') {
+    return 'http://localhost:8787';
+  }
+  
+  // Production environment
+  return 'https://deephand-forms-production.sheegull.workers.dev';
+};
+
+export const API_ENDPOINTS = {
+  contact: `${getApiBaseUrl()}/api/contact`,
+  requestData: `${getApiBaseUrl()}/api/request-data`,
+} as const;
+
+// Helper function for API calls with error handling
+export const apiCall = async (url: string, data: any) => {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Failed to submit form');
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
   }
 
   return response.json();

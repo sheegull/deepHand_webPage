@@ -1,13 +1,31 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { logNavigation } from "../../lib/analytics";
 import { HeroSectionByAnima } from "./sections/HeroSectionByAnima";
 import { RequestDataPageByAnima } from "./sections/RequestDataPageByAnima";
 
 export const Frame = (): JSX.Element => {
-  const [currentPage, setCurrentPage] = useState<'hero' | 'request'>('hero');
+  const [currentPage, setCurrentPage] = useState<'hero' | 'request'>(() => {
+    // Check current URL path to determine initial page
+    const path = window.location.pathname;
+    return path === '/request' ? 'request' : 'hero';
+  });
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigateToHome = () => setCurrentPage('hero');
+  const navigateToHome = () => {
+    setCurrentPage('hero');
+    window.history.pushState({}, '', '/');
+  };
+
+  // Handle browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      setCurrentPage(path === '/request' ? 'request' : 'hero');
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const navigateToRequest = useCallback(async (from: string) => {
     setIsLoading(true);

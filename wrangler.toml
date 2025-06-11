@@ -1,24 +1,31 @@
-[env.production]
 name = "deephand-forms"
 main = "src/worker/index.ts"
 compatibility_date = "2025-05-16"
 compatibility_flags = ["nodejs_compat"]
-send_email = [
-  { name = "NOTIFY", destination_address = "contact@deephandai.com" }
-]
 
+# Development environment
+[env.development]
+[env.development.vars]
+CONTACT_EMAIL = "yogoism@gmail.com"
+MAX_REQUESTS_PER_HOUR = "100"
+
+# Production environment
+[env.production]
 [env.production.vars]
-CONTACT_EMAIL = "contact@deephandai.com"
+CONTACT_EMAIL = "yogoism@gmail.com"
 MAX_REQUESTS_PER_HOUR = "10"
-MAILCHANNELS_API_KEY = ""  # Will be set via Cloudflare dashboard
 
 [[env.production.r2_buckets]]
 binding = "FORM_STORAGE"
 bucket_name = "deephand-form"
 
 [[env.production.kv_namespaces]]
-binding = "KV"
+binding = "IP_RATE_LIMITER"
 id = "31c48323ffe140bfa8f0dfbf11599cb4"
 
-[env.production.analytics_engine]
-binding = "ANALYTICS"
+# [[env.production.analytics_engine_datasets]]
+# binding = "FORM_ANALYTICS"
+# dataset = "deephand_forms"
+
+[[env.production.send_email]]
+name = "NOTIFY"

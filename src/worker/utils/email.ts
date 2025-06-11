@@ -46,21 +46,26 @@ function generateEmailText(template: string, data: Record<string, unknown>): str
 New Contact Form Submission
 
 Name: ${data.name}
+Organization: ${data.organization || 'N/A'}
 Email: ${data.email}
 Message: ${data.message}
       `.trim();
 
     case 'request-data':
+      const dataTypes = Array.isArray(data.dataType) ? data.dataType.join(', ') : data.dataType;
       return `
 New Data Request
 
-Full Name: ${data.fullName}
-Company: ${data.companyName || 'N/A'}
-Work Email: ${data.workEmail}
-Data Type: ${data.dataType}
-Data Amount: ${data.dataAmount}
+Name: ${data.name}
+Organization: ${data.organization || 'N/A'}
+Email: ${data.email}
+Background and Purpose: ${data.backgroundPurpose}
+Data Type: ${dataTypes}
+Data Details: ${data.dataDetails || 'N/A'}
+Data Volume: ${data.dataVolume}
 Deadline: ${data.deadline}
-Additional Details: ${data.additionalDetails || 'N/A'}
+Budget: ${data.budget}
+Other Requirements: ${data.otherRequirements || 'N/A'}
       `.trim();
 
     default:

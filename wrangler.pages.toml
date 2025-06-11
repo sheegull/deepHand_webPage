@@ -1,0 +1,14 @@
+name = "deephand-frontend"
+compatibility_date = "2025-05-16"
+pages_build_output_dir = "dist"
+
+[build]
+command = "npm run build"
+cwd = "."
+
+# Environment variables for Pages
+[env.production.vars]
+VITE_API_URL = "https://deephand-forms-production.sheegull.workers.dev"
+
+[env.preview.vars]
+VITE_API_URL = "https://deephand-forms-production.sheegull.workers.dev"
