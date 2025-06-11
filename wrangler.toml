@@ -29,3 +29,4 @@ id = "31c48323ffe140bfa8f0dfbf11599cb4"
 
 [[env.production.send_email]]
 name = "NOTIFY"
+destination_address = "yogoism@gmail.com"
