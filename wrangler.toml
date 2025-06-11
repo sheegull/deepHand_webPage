@@ -13,7 +13,7 @@ MAX_REQUESTS_PER_HOUR = "100"
 [env.production]
 [env.production.vars]
 CONTACT_EMAIL = "yogoism@gmail.com"
-MAX_REQUESTS_PER_HOUR = "10"
+MAX_REQUESTS_PER_HOUR = "100"
 
 [[env.production.r2_buckets]]
 binding = "FORM_STORAGE"
